@@ -1,0 +1,734 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="Still Waters Run Deep." />
+
+
+
+  <meta name="keywords" content="CSRF,安全," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="在进行WEB开发的时候，时常听到资深的开发人员说要注意防范CSRF、XSS攻击，但是很多时候人们连什么是CSRF都不知道。本文将粗略地向大家介绍下CSRF的原理和防御手段。
+一、CSRF是什么首先，来看看CSRF是什么。依据Wikipedia的解释，含义如下：
+CSRF（Cross-site request forgery）跨站请求伪造，也被称成为点击攻击或者会话劫持，通常缩写为CSRF或者XSR">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅析CSRF">
+<meta property="og:url" content="http://yoursite.com/2013/09/27/csrf-brief-analysis/index.html">
+<meta property="og:site_name" content="Javan's Blog">
+<meta property="og:description" content="在进行WEB开发的时候，时常听到资深的开发人员说要注意防范CSRF、XSS攻击，但是很多时候人们连什么是CSRF都不知道。本文将粗略地向大家介绍下CSRF的原理和防御手段。
+一、CSRF是什么首先，来看看CSRF是什么。依据Wikipedia的解释，含义如下：
+CSRF（Cross-site request forgery）跨站请求伪造，也被称成为点击攻击或者会话劫持，通常缩写为CSRF或者XSR">
+<meta property="og:updated_time" content="2015-08-19T14:33:51.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅析CSRF">
+<meta name="twitter:description" content="在进行WEB开发的时候，时常听到资深的开发人员说要注意防范CSRF、XSS攻击，但是很多时候人们连什么是CSRF都不知道。本文将粗略地向大家介绍下CSRF的原理和防御手段。
+一、CSRF是什么首先，来看看CSRF是什么。依据Wikipedia的解释，含义如下：
+CSRF（Cross-site request forgery）跨站请求伪造，也被称成为点击攻击或者会话劫持，通常缩写为CSRF或者XSR">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> 浅析CSRF | Javan's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Javan's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'hV94zB5BAjdxzas-hytK','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              浅析CSRF
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2013-09-27T10:37:00+08:00" content="2013-09-27">
+            2013-09-27
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/技术/" itemprop="url" rel="index">
+                  <span itemprop="name">技术</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2013/09/27/csrf-brief-analysis/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2013/09/27/csrf-brief-analysis/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>在进行WEB开发的时候，时常听到资深的开发人员说要注意防范CSRF、XSS攻击，但是很多时候人们连什么是CSRF都不知道。本文将粗略地向大家介绍下CSRF的原理和防御手段。</p>
+<h2 id="一、CSRF是什么">一、<strong>CSRF是什么</strong></h2><p>首先，来看看CSRF是什么。依据Wikipedia的解释，含义如下：</p>
+<blockquote><p>CSRF（Cross-site request forgery）跨站请求伪造，也被称成为点击攻击或者会话劫持，通常缩写为CSRF或者XSRF，是一种恶意利用终端用户在当前已登录的Web应用程序上执行非本意的操作的攻击方法。XSS利用站点内的信任用户，而CSRF则通过伪装来自受信任用户的请求来利用受信任的网站。</p>
+<footer><strong>Wikipedia</strong><cite><a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery" target="_blank" rel="external">Cross-site request forgery<sup>[1]</sup></a></cite></footer></blockquote>
+<p>通俗来讲，CSRF攻击通过在授权用户访问的页面中包含链接或者脚本的方式工作。让我们通过两个例子来对这段晦涩的定义做出解释。</p>
+<a id="more"></a>
+<ol>
+<li><p>一个网站用户 Alice 可能正在浏览聊天论坛，而同时另一个用户 Eve 也在此论坛中发布了一个具有 Alice 银行链接的图片消息。设想一下，Eve 编写了一个在 Alice 的银行站点上进行取款的form提交的链接，并将此链接作为图片tag。如果 Alice 的银行在cookie中保存他的授权信息，并且此cookie没有过期，那么当 Alice 的浏览器尝试装载图片时将提交这个取款form和他的cookie，这样在没经 Alice 同意的情况下便授权了这次事务。</p>
+</li>
+<li><p>2009年黑客利用Gmail的一个CSRF漏洞，成功获取了好莱坞明星Vanessa Hudgens的独家艳照<sup>[2]</sup>。其攻击过程非常简单，给该明星的gmail账户发了一封email，标题是某大导演邀请你来看看这个电影，里面有个图片(该图片实际是Gmail转发的URL)，结果她登录Gmail，打开邮件就默默无闻的中招了，所有邮件被转发到黑客的账号。</p>
+</li>
+</ol>
+<p>通过上面两个例子，可以总结出<strong>CSRF攻击的常见特性</strong>：</p>
+<ul>
+<li>依赖使用用户标识的网站；</li>
+<li>利用网站对用户标识的信任；</li>
+<li>欺骗用户的浏览器发送HTTP请求给目标站点；</li>
+<li>依靠具有<a href="http://en.wikipedia.org/wiki/HTTP#Safe_methods" target="_blank" rel="external">side effect</a><sup>[3]</sup>的HTTP请求。</li>
+</ul>
+<p><strong>CSRF攻击步骤</strong>如下：</p>
+<ol>
+<li>受害者必须在同一浏览器窗口（即使不是同一tab）内访问并登陆目标站点；</li>
+<li>利用用户有效的Session cookie，从而利用受害者的身份进行恶意操作。 </li>
+</ol>
+<h2 id="二、技术分析">二、<strong>技术分析</strong></h2><p>大家可能对CSRF是什么还是一头雾水，那么用前面提到的的银行CSRF攻击的例子从代码层面来展示CSRF攻击是怎么做到的。</p>
+<h3 id="1-_回合Ⅰ">1. 回合Ⅰ</h3><p><em>银行网站A</em>：它以GET请求来完成银行转账的操作，格式如： <code>http://bank.example.com/transfer.do?money=${val}&amp;to=${BankId}</code>，其中<code>${val}</code>表示金额，<code>${BankId}</code>表示收款方的银行卡。</p>
+<p><em>危险网站B</em>：它里面有一段HTML的代码如下：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">html</span> <span class="attribute">xmlns</span>=<span class="value">"http://www.w3.org/1999/xhtml"</span> <span class="attribute">xml:lang</span>=<span class="value">"en"</span> <span class="attribute">lang</span>=<span class="value">"en"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">meta</span> <span class="attribute">http-equiv</span>=<span class="value">"Content-Type"</span> <span class="attribute">content</span>=<span class="value">"text/html; charset=utf-8"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">title</span>&gt;</span>csrf attack<span class="tag">&lt;/<span class="title">title</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">body</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="title">img</span> <span class="attribute">src</span>=<span class="value">"http://bank.example.com/transfer.do?moeny=100&amp;to=1"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>你登录了银行网站A，然后访问了危险网站B。啊哈，你账户里面的钱被窃取了100元。见鬼了，为什么会这样？这里银行使用GET请求更新资源，在你登录了银行网站A的前提下，访问网站B上的<code>&lt;img&gt;</code>就能以你的身份（浏览器中你的银行网站A的Cookie中的信息）以GET的方式发起转账操作，请求了银行的服务器。由于有合法的身份标识，银行网站服务器收到请求后立即进行转账操作。</p>
+<h3 id="2-_回合Ⅱ">2. 回合Ⅱ</h3><p>好吧，银行决定采用POST方式来发送请求，后台只接受POST请求来进行更新资源的操作，前台采用<code>Form</code>表单的方式进行POST请求。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">form</span> <span class="attribute">action</span>=<span class="value">"transfer.do"</span> <span class="attribute">method</span>=<span class="value">"POST"</span>&gt;</span></span><br><span class="line">　　ToBankId: <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">name</span>=<span class="value">"to"</span> /&gt;</span></span><br><span class="line">　　Money: <span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">name</span>=<span class="value">"money"</span> /&gt;</span></span><br><span class="line">　　<span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"submit"</span> <span class="attribute">value</span>=<span class="value">"Transfer"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这样感觉安全了，但是攻击者也做出相应的变化，将网站B的页面改成如下内容：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">script</span> <span class="attribute">type</span>=<span class="value">"text/javascript"</span>&gt;</span><span class="javascript"></span><br><span class="line">		<span class="function"><span class="keyword">function</span> <span class="title">steal</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">	    	iframe = <span class="built_in">document</span>.frames[<span class="string">"steal"</span>];</span><br><span class="line">	　　    iframe.document.Submit(<span class="string">"transfer"</span>);</span><br><span class="line">	　　&#125;</span><br><span class="line">	</span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">body</span> <span class="attribute">onload</span>=<span class="value">"steal()"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">iframe</span> <span class="attribute">name</span>=<span class="value">"steal"</span> <span class="attribute">display</span>=<span class="value">"none"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">form</span> <span class="attribute">method</span>=<span class="value">"POST"</span> <span class="attribute">name</span>=<span class="value">"transfer"</span>　<span class="attribute">action</span>=<span class="value">"http://www.myBank.com/transfer.do"</span>&gt;</span></span><br><span class="line">　　　　		<span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"hidden"</span> <span class="attribute">name</span>=<span class="value">"to"</span> <span class="attribute">value</span>=<span class="value">"1"</span>/&gt;</span></span><br><span class="line">    		<span class="tag">&lt;<span class="title">input</span> <span class="attribute">type</span>=<span class="value">"text"</span> <span class="attribute">name</span>=<span class="value">"money"</span> <span class="attribute">value</span>=<span class="value">"100"</span>/&gt;</span></span><br><span class="line">　　　　	<span class="tag">&lt;/<span class="title">form</span>&gt;</span></span><br><span class="line">　　	<span class="tag">&lt;/<span class="title">iframe</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如果用户仍是继续上面的操作，发现钱同样没有了，因为危险网站B暗地里又以你的身份发送了POST请求到银行。</p>
+<p><a href="http://netsecurity.51cto.com/art/200811/97281_1.htm" target="_blank" rel="external">《Web安全测试之跨站请求伪造(CSRF)篇》</a><sup>[4]</sup> 和 <a href="http://netsecurity.51cto.com/art/200812/102925_1.htm" target="_blank" rel="external">《深入解析跨站请求伪造漏洞：实例讲解》</a><sup>[5]</sup> 中还有更多的实例讲解。</p>
+<h2 id="三、原理剖析"><strong>三、原理剖析</strong></h2><p>归根结底，<strong><u>CSRF攻击是源于WEB的隐式身份验证机制</u></strong>。<strong><u>WEB的身份验证机制虽然可以保证一个请求是来自于某个用户的浏览器，但却无法保证该请求是用户批准发送的</u></strong>。 </p>
+<blockquote><p>例如，假如Alice在浏览目标站点T，那么站点T便会给Alice的浏览器一个cookie，用于存放一个伪随机数作为会话标识符sid，以跟踪她的会话。该站点会要求Alice进行登录，当她输入有效的用户名和口令时，该站点会记录这样一个事实：Alice已经登录到会话sid。当Alice发送一个请求到站点T时，她的浏览器就会自动地发送包含sid的会话cookie。之后，站点T就会使用站点的会话记录来识别该会话是否来自Alice。</p>
+<p>现在，假设Alice访问了一个恶意站点M，该站点提供的内容中的JavaScript代码或者图像标签会导致Alice的浏览器向站点T发送一个HTTP请求。由于该请求是发给站点T的，所以Alice的浏览器自动地给该请求附上与站点T对应的该会话cookie的sid。站点T看到该请求时，它就能通过该cookie的推断出：该请求来自Alice，所以站点T就会对Alice的帐户执行所请求的操作。这样，CSRF攻击就能得逞了。</p>
+<p>其他大多数Web认证机制也面临同样的问题。例如，HTTP BasicAuth机制会要求Alice告诉浏览器她在站点T上的用户名和口令，于是浏览器将用户名和口令附加到之后发给站点T的请求中。当然，站点T也可能使用客户端SSL证书，但这也面临同样的问题，因为浏览器也会将证书附加到发给站点T的请求中。类似的，如果站点T通过IP地址来验证Alice的身份的话，照样面临CSRF攻击的威胁。</p>
+<footer><strong>51CTO.COM</strong><cite><a href="http://netsecurity.51cto.com/art/200812/102951_1.htm" target="_blank" rel="external">深入解析跨站请求伪造漏洞：原理剖析<sup>[6]</sup></a></cite></footer></blockquote>
+<p>总之，只要身份认证是隐式进行的，就会存在CSRF攻击的危险，因为浏览器发出请求这一动作未必是受用户的指使。原则上，这种威胁可以通过对每个发送至该站点的请求都要求用户进行显式的、不可欺骗的动作（诸如重新输入用户名和口令）来消除，但实际上这会导致严重的易用性问题。</p>
+<h2 id="四、如何防御"><strong>四、如何防御</strong></h2><p>那么如何防御呢？大体来说，可以从服务端、客户端和安全设备这三个点来进行防御。</p>
+<h3 id="服务端防御">服务端防御</h3><p>目前业界服务端防御CSRF攻击主要有三种策略<sup>[7]</sup>：验证<code>HTTP Referer</code>字段，在请求地址中添加token并验证，在HTTP头中自定义属性并验证。下面分别简述之。</p>
+<h4 id="1-_验证HTTP_Referer字段">1. 验证HTTP Referer字段</h4><p>根据HTTP协议，在HTTP头中有一个字段叫Referer，它记录了该HTTP请求的来源地址。在通常情况下，访问一个安全受限页面的请求必须来自于同一个网站。比如某银行的转账是通过用户访问<code>http://bank.test/test?page=10&amp;userID=101&amp;money=10000</code> 页面完成，用户必须先登录<code>bank.test</code>，然后通过点击页面上的按钮来触发转账事件。当用户提交请求时，该转账请求的Referer值就会是转账按钮所在页面的URL（本例中，通常是以<code>bank.test</code>域名开头的地址）。而如果攻击者要对银行网站实施CSRF攻击，他只能在自己的网站构造请求，当用户通过攻击者的网站发送请求到银行时，该请求的Referer是指向攻击者的网站。因此，要防御CSRF攻击，银行网站只需要对于每一个转账请求验证其Referer值，如果是以<code>bank.test</code>开头的域名，则说明该请求是来自银行网站自己的请求，是合法的。如果Referer是其他网站的话，就有可能是CSRF攻击，则拒绝该请求。</p>
+<h4 id="2-_在请求地址中添加token并验证">2. 在请求地址中添加token并验证</h4><p>CSRF攻击之所以能够成功，是因为攻击者可以伪造用户的请求，该请求中所有的用户验证信息都存在于Cookie中，因此攻击者可以在不知道这些验证信息的情况下直接利用用户自己的Cookie来通过安全验证。由此可知，抵御CSRF攻击的关键在于：在请求中放入攻击者所不能伪造的信息，并且该信息不存在于Cookie之中。鉴于此，系统开发者可以在HTTP请求中以参数的形式加入一个随机产生的token，并在服务器端建立一个拦截器来验证这个token，如果请求中没有token或者token内容不正确，则认为可能是CSRF攻击而拒绝该请求。</p>
+<h4 id="3-_在HTTP头中自定义属性并验证">3. 在HTTP头中自定义属性并验证</h4><p>自定义属性的方法也是使用token并进行验证，和前一种方法不同的是，这里并不是把token以参数的形式置于HTTP请求之中，而是把它放到HTTP头中自定义的属性里。通过<code>XMLHttpRequest</code>这个类，可以一次性给所有该类请求加上csrftoken这个HTTP头属性，并把token值放入其中。这样解决了前一种方法在请求中加入token的不便，同时，通过这个类请求的地址不会被记录到浏览器的地址栏，也不用担心token会通过Referer泄露到其他网站。</p>
+<h3 id="客户端">客户端</h3><p>对于普通用户来说，都学习并具备网络安全知识以防御网络攻击是不现实的。但若用户养成良好的上网习惯，则能够很大程度上减少CSRF攻击的危害。例如，用户上网时，不要轻易点击网络论坛、聊天室、即时通讯工具或电子邮件中出现的链接或者图片；及时退出长时间不使用的已登录账户，尤其是系统管理员，应尽量在登出系统的情况下点击未知链接和图片。除此之外，用户还需要在连接互联网的计算机上安装合适的安全防护软件，并及时更新软件厂商发布的特征库，以保持安全软件对最新攻击的实时跟踪。</p>
+<p>另外，现在有一些浏览器插件可以进行简单的防御工作，但是有一些局限性。</p>
+<h3 id="安全设备">安全设备</h3><p>CSRF攻击的本质是攻击者伪造了合法的身份，对系统进行访问。如果能够识别出访问者的伪造身份，也就能识别CSRF攻击。研究发现，有些厂商的安全产品能基于硬件层面对HTTP头部的Referer字段内容进行检查来快速准确的识别CSRF攻击。但是这种方式代价昂贵，一般并不会采用这种防御方案。</p>
+<p>一般而言，最常用的就是采用服务端防御策略。解决办法就是在Form表单加一个hidden field，里面是服务端生成的足够随机数的一个Token，使得黑客猜不到也无法仿照Token。 </p>
+<h2 id="五、具体实现"><strong>五、具体实现</strong></h2><p>《浅谈CSRF攻击方式》<sup>[8]</sup>给出了一些常见的服务端防御实现，我也将给出一种在 SpringMVC3+Velocity 的框架下防御CSRF攻击的解决方案，详见<a href="http://javanlu.github.io/blog/2013/09/29/springmvc-csrf-defense/" target="_blank" rel="external">《一种在SpirngMVC3中防御CSRF攻击的实现》</a><sup>[9]</sup>。</p>
+<blockquote>
+<h3 id="参考资料">参考资料</h3><p>[1] CSRF Wikipedia 定义：<a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery" target="_blank" rel="external">http://en.wikipedia.org/wiki/Cross-site_request_forgery</a> </p>
+<p>[2] Spring MVC防御CSRF、XSS和SQL注入攻击：<a href="http://www.cnblogs.com/Mainz/archive/2012/11/01/2749874.html" target="_blank" rel="external">http://www.cnblogs.com/Mainz/archive/2012/11/01/2749874.html</a></p>
+<p>[3] side effect：<a href="http://en.wikipedia.org/wiki/HTTP#Safe_methods" target="_blank" rel="external">http://en.wikipedia.org/wiki/HTTP#Safe_methods</a></p>
+<p>[4] Web安全测试之跨站请求伪造(CSRF)篇：<a href="http://netsecurity.51cto.com/art/200811/97281_1.htm" target="_blank" rel="external">(http://netsecurity.51cto.com/art/200811/97281_1.htm</a></p>
+<p>[5] 深入解析跨站请求伪造漏洞：实例讲解：<a href="http://netsecurity.51cto.com/art/200812/102925_1.htm" target="_blank" rel="external">http://netsecurity.51cto.com/art/200812/102925_1.htm</a></p>
+<p>[6] 深入解析跨站请求伪造漏洞：原理剖析：<a href="http://netsecurity.51cto.com/art/200812/102951_1.htm" target="_blank" rel="external">http://netsecurity.51cto.com/art/200812/102951_1.htm</a></p>
+<p>[7] CSRF的攻击与防御：<a href="http://www.h3c.com.cn/About_H3C/Company_Publication/IP_Lh/2012/04/Home/Catalog/201208/751467_30008_0.htm" target="_blank" rel="external">http://www.h3c.com.cn/About_H3C/Company_Publication/IP_Lh/2012/04/Home/Catalog/201208/751467_30008_0.htm</a></p>
+<p>[8] 浅谈CSRF攻击方式：<a href="http://www.cnblogs.com/hyddd/archive/2009/04/09/1432744.html" target="_blank" rel="external">http://www.cnblogs.com/hyddd/archive/2009/04/09/1432744.html</a></p>
+<p>[9] 一种在SpirngMVC3中防御CSRF攻击的实现：<a href="http://javanlu.github.io/blog/2013/09/29/springmvc-csrf-defense/" target="_blank" rel="external">http://javanlu.github.io/blog/2013/09/29/springmvc-csrf-defense/</a></p>
+</blockquote>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CSRF/" rel="tag">#CSRF</a>
+          
+            <a href="/tags/安全/" rel="tag">#安全</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/09/27/octopress-href-target-blank/" rel="prev">Octopress中设置markdown超链接target</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/09/27/git-learning/" rel="next">Git学习资料</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2013/09/27/csrf-brief-analysis/"
+                   data-title="浅析CSRF" data-url="http://yoursite.com/2013/09/27/csrf-brief-analysis/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="http://www.gravatar.com/avatar/f1d8cf8dbe2d0ce8d8255810a3138fa2?s=160" alt="JavanLu" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">JavanLu</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Still Waters Run Deep.</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、CSRF是什么"><span class="nav-number">1.</span> <span class="nav-text">一、CSRF是什么</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、技术分析"><span class="nav-number">2.</span> <span class="nav-text">二、技术分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-_回合Ⅰ"><span class="nav-number">2.1.</span> <span class="nav-text">1. 回合Ⅰ</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-_回合Ⅱ"><span class="nav-number">2.2.</span> <span class="nav-text">2. 回合Ⅱ</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、原理剖析"><span class="nav-number">3.</span> <span class="nav-text">三、原理剖析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、如何防御"><span class="nav-number">4.</span> <span class="nav-text">四、如何防御</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#服务端防御"><span class="nav-number">4.1.</span> <span class="nav-text">服务端防御</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-_验证HTTP_Referer字段"><span class="nav-number">4.1.1.</span> <span class="nav-text">1. 验证HTTP Referer字段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-_在请求地址中添加token并验证"><span class="nav-number">4.1.2.</span> <span class="nav-text">2. 在请求地址中添加token并验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-_在HTTP头中自定义属性并验证"><span class="nav-number">4.1.3.</span> <span class="nav-text">3. 在HTTP头中自定义属性并验证</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#客户端"><span class="nav-number">4.2.</span> <span class="nav-text">客户端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安全设备"><span class="nav-number">4.3.</span> <span class="nav-text">安全设备</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、具体实现"><span class="nav-number">5.</span> <span class="nav-text">五、具体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2013 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JavanLu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"javansblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

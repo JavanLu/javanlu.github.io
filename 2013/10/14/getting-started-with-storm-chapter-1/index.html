@@ -1,0 +1,723 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="Still Waters Run Deep." />
+
+
+
+  <meta name="keywords" content="Storm," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="最近需要使用Storm，看了一些英文资料。觉得 O’Reilly 的 Getting started with Storm 比较浅显易懂，适合作为入门资料。特翻译之，以飨众生。
+特别注明：本文翻译自 Getting started with Storm 第一章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+Storm 是一个可靠的、容错的分布式数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[译]【Storm 入门指南】第一章 基础">
+<meta property="og:url" content="http://yoursite.com/2013/10/14/getting-started-with-storm-chapter-1/index.html">
+<meta property="og:site_name" content="Javan's Blog">
+<meta property="og:description" content="最近需要使用Storm，看了一些英文资料。觉得 O’Reilly 的 Getting started with Storm 比较浅显易懂，适合作为入门资料。特翻译之，以飨众生。
+特别注明：本文翻译自 Getting started with Storm 第一章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+Storm 是一个可靠的、容错的分布式数据">
+<meta property="og:image" content="http://yoursite.com/images/post/storm/chapter1/fig1.png">
+<meta property="og:image" content="http://yoursite.com/images/post/storm/chapter1/fig2.png">
+<meta property="og:updated_time" content="2015-08-08T05:42:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[译]【Storm 入门指南】第一章 基础">
+<meta name="twitter:description" content="最近需要使用Storm，看了一些英文资料。觉得 O’Reilly 的 Getting started with Storm 比较浅显易懂，适合作为入门资料。特翻译之，以飨众生。
+特别注明：本文翻译自 Getting started with Storm 第一章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+Storm 是一个可靠的、容错的分布式数据">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> [译]【Storm 入门指南】第一章 基础 | Javan's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Javan's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'hV94zB5BAjdxzas-hytK','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              [译]【Storm 入门指南】第一章 基础
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2013-10-14T17:24:00+08:00" content="2013-10-14">
+            2013-10-14
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/技术/" itemprop="url" rel="index">
+                  <span itemprop="name">技术</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2013/10/14/getting-started-with-storm-chapter-1/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2013/10/14/getting-started-with-storm-chapter-1/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>最近需要使用Storm，看了一些英文资料。觉得 O’Reilly 的 <a href="http://shop.oreilly.com/product/0636920024835.do" target="_blank" rel="external">Getting started with Storm</a> 比较浅显易懂，适合作为入门资料。特翻译之，以飨众生。</p>
+<p>特别注明：本文翻译自 <a href="http://shop.oreilly.com/product/0636920024835.do" target="_blank" rel="external">Getting started with Storm</a> 第一章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。</p>
+</blockquote>
+<p>Storm 是一个可靠的、容错的分布式数据流处理系统。它将工作委派给不同类型的组件，这些组件各自负责某个简单特定的处理任务。Storm 集群的输入流由组件<code>spout</code>负责。<code>spout</code>将数据传送至<code>bolt</code>，进而完成某种形式的转换。<code>bolt</code> 可采用某种存储形式对数据进行持久化，或者将数据传送至其它 <code>bolt</code>。 你可以将 Storm 集群想象成一个<code>bolt</code>链，每个<code>bolt</code>负责对从<code>spout</code>流入的数据进行某种形式的处理。</p>
+<a id="more"></a>
+<p>现在举例来说明这个概念。昨晚，我观看了一个新闻节目，节目中发言人不停地谈论政治家和他们在不同领域的位置。他们提到了许多不同的名字，我想知道是否每个名字都被同等次数地被提及，还是某几个名字被反复提及。</p>
+<p>将发言的副标题当作数据的输入流，使用一个<code>spout</code>从文件中读取该内容（通过socket、HTTP或者其他途径）；当文本到达时，<code>spout</code>将它们传送到负责分词的<code>bolt</code>；之后每个单词被传送到另一个<code>bolt</code>，在该<code>bolt</code>中将单词与预先定义好的政治家名单进行比对，如果匹配，将数据库中的对应名字的计数递增。无论何时你想查看结果，从数据库中查询即可。且随着数据源源不断地过来，结果是实时更新的。所有的组件（<code>spout</code>和<code>bolt</code>）和连接所组成的结构被称为拓扑（<em>topology</em>）[见图1.1]。</p>
+<p><img src="/images/post/storm/chapter1/fig1.png" alt="图1.1"></p>
+<p>现在可以很容易地想象将每个<code>bolt</code>和<code>spout</code>的并行水平拓展到整个集群，这样可以无限扩展拓扑。很神奇，对吧！即使透过这个简单的例子，你也可以洞悉Strom的强大力量。</p>
+<p>那么，Storm 适合什么样的场景？</p>
+<ul>
+<li>流数据处理<br>：正如上述例子所展示的，Storm 不像其他流处理系统，它不需要任何内部队列。</li>
+<li>持续计算<br>：持续地向客户端发送数据，它们能够实时更新和展示结果，比如网站指标。</li>
+<li>分布式远程方法调用<br>：轻松地并发执行CPU密集型操作。</li>
+</ul>
+<h1 id="1-1_Storm_组件">1.1 Storm 组件</h1><p>在Storm集群中，节点被组织到持续运行的管理节点中。集群中有两类节点：管理节点和工作节点。管理节点运行一个称为 <code>Nimbus</code> 的守护进程，以此来响应集群中分散的节点、给工作节点分配任务并监控失败。工作节点运行一个称为 <code>Supervisor</code> 的守护进程来执行拓扑中的一部分功能。一个 Storm 拓扑运行在不同的机器上的工作节点。</p>
+<p>由于Storm将集群的状态保存在 Zookeeper 或本地磁盘中，因此守护进程是无状态的，可以在不损害系统健康的同时失败或重启[见图1.2]。</p>
+<p><img src="/images/post/storm/chapter1/fig2.png" alt="图1.2"></p>
+<p>Storm的底层采用 zeromq（Omq, <a href="http://www.zeromq.org" target="_blank" rel="external">zeromq</a>）—— 一个先进的嵌入式网络通讯库，为Storm提供了很多令人激动的功能。以下列出了 zeromq 的特点：</p>
+<ul>
+<li>支持高并发的网络通讯库</li>
+<li>比TCP更快，适用于大型生产集群和超级计算</li>
+<li>采用进程内通信、进程间通信、TCP和多播传递消息</li>
+<li>异步I/O，适用于扩展的多核消息传递应用中</li>
+<li>通过扇出、发布订阅、管道、请求-应答实现多对多连接</li>
+</ul>
+<blockquote>
+<p>Storm 使用了推/拉（push/pull）套接字</p>
+</blockquote>
+<h1 id="1-2_Storm特性">1.2 Storm特性</h1><p>所有的设计概念和决策，最终使得 Storm 独一无二，拥有几个非常美好的特性。</p>
+<ul>
+<li><p>编程模型简单<br>：如果你曾尝试过进行实时处理，就知道编码起来有多痛苦，但是 Storm 却显著降低了这种复杂度。</p>
+</li>
+<li><p>支持多种编程语言<br>：除了可以使用基于JVM的语言，你还可以使用任何你熟悉的编程语言。</p>
+</li>
+<li><p>容错性<br>：Storm 集群能够合理处理工作节点的各种突发状况，如减少节点、重新分配任务等。</p>
+</li>
+<li><p>可扩展<br>：为了能够扩展，你需要做的仅是往集群中增加更多机器，Storm 会自行往可用的新增机器上分配任务。</p>
+</li>
+<li><p>可靠性<br>：可以保证所有消息至少被处理一次。如果出错了，消息可能会被处理多次，但从不会丢失消息。</p>
+</li>
+<li><p>高效<br>：速度是设计 Storm 的一个重要标准。</p>
+</li>
+<li><p>事务性<br>：你可以得到几乎任何一次计算的消息语义。</p>
+</li>
+</ul>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Storm/" rel="tag">#Storm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/10/15/getting-started-with-storm-chapter-2/" rel="prev">[译]【Storm入门指南】第二章 入门实例</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/10/11/storm-deploy-tutorial/" rel="next">Storm 单机版安装指南</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2013/10/14/getting-started-with-storm-chapter-1/"
+                   data-title="[译]【Storm 入门指南】第一章 基础" data-url="http://yoursite.com/2013/10/14/getting-started-with-storm-chapter-1/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="http://www.gravatar.com/avatar/f1d8cf8dbe2d0ce8d8255810a3138fa2?s=160" alt="JavanLu" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">JavanLu</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Still Waters Run Deep.</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-1_Storm_组件"><span class="nav-number">1.</span> <span class="nav-text">1.1 Storm 组件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-2_Storm特性"><span class="nav-number">2.</span> <span class="nav-text">1.2 Storm特性</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2013 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JavanLu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"javansblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

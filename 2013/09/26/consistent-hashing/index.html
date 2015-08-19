@@ -1,0 +1,715 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="Still Waters Run Deep." />
+
+
+
+  <meta name="keywords" content="Hash," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="英文原文链接：https://weblogs.java.net/blog/2007/11/27/consistent-hashing[1]
+
+最近一段时间醉心于研究一致性哈希算法。本文所介绍的算法思想，早在1997年就已被 David Karger等人的在 论文中[2]提出，直到最近人们才发现这种思想可以运用到很多领域，从亚马逊的Dynamo[3]到memcached。所以，我们不禁要问，什么是一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[译] 一致性哈希算法">
+<meta property="og:url" content="http://yoursite.com/2013/09/26/consistent-hashing/index.html">
+<meta property="og:site_name" content="Javan's Blog">
+<meta property="og:description" content="英文原文链接：https://weblogs.java.net/blog/2007/11/27/consistent-hashing[1]
+
+最近一段时间醉心于研究一致性哈希算法。本文所介绍的算法思想，早在1997年就已被 David Karger等人的在 论文中[2]提出，直到最近人们才发现这种思想可以运用到很多领域，从亚马逊的Dynamo[3]到memcached。所以，我们不禁要问，什么是一">
+<meta property="og:image" content="http://yoursite.com/images/post/algorithm/hash_1.png">
+<meta property="og:image" content="http://yoursite.com/images/post/algorithm/hash_2.png">
+<meta property="og:image" content="http://yoursite.com/images/post/algorithm/hash_3.png">
+<meta property="og:updated_time" content="2015-08-19T14:33:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[译] 一致性哈希算法">
+<meta name="twitter:description" content="英文原文链接：https://weblogs.java.net/blog/2007/11/27/consistent-hashing[1]
+
+最近一段时间醉心于研究一致性哈希算法。本文所介绍的算法思想，早在1997年就已被 David Karger等人的在 论文中[2]提出，直到最近人们才发现这种思想可以运用到很多领域，从亚马逊的Dynamo[3]到memcached。所以，我们不禁要问，什么是一">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> [译] 一致性哈希算法 | Javan's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Javan's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'hV94zB5BAjdxzas-hytK','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              [译] 一致性哈希算法
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2013-09-26T15:38:00+08:00" content="2013-09-26">
+            2013-09-26
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/算法/" itemprop="url" rel="index">
+                  <span itemprop="name">算法</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2013/09/26/consistent-hashing/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2013/09/26/consistent-hashing/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>英文原文链接：<a href="https://weblogs.java.net/blog/2007/11/27/consistent-hashing" title="Consistent Hashing" target="_blank" rel="external">https://weblogs.java.net/blog/2007/11/27/consistent-hashing</a><sup>[1]</sup></p>
+</blockquote>
+<p>最近一段时间醉心于研究一致性哈希算法。本文所介绍的算法思想，早在1997年就已被 <a href="http://people.csail.mit.edu/karger/" target="_blank" rel="external">David Karger</a>等人的在 <a href="http://dl.acm.org/citation.cfm?id=258660" title="Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web" target="_blank" rel="external">论文中</a><sup>[2]</sup>提出，直到最近人们才发现这种思想可以运用到很多领域，从亚马逊的<a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html" title="Amazon&#39;s Dynamo" target="_blank" rel="external">Dynamo</a><sup>[3]</sup>到<a href="http://memcached.org/" title="memcached" target="_blank" rel="external">memcached</a>。所以，我们不禁要问，<strong>什么是一致性哈希</strong> 以及 <strong>为什么你要关注它</strong>。</p>
+<a id="more"></a>
+<p>由于使用分布式缓存(比如web缓存)时会遇到各种局限性，促成了对一致性哈希的需求。比如你有N台cache服务器（<em>后文简称 cache</em>），那么如何将一个对象object映射到N个cache上来进行负载均衡？通用的方式是计算对象的哈希值取模 <code>hash(object) mod N</code> 来完成。但是如果增加或者删除某个cache，那么这种方式就不会完美地工作。因为这必然导致每个对象都需要映射到新的位置上，意味着几乎所有的cache突然间都失效了。对服务器而言，这会是一场灾难，因为洪水般的访问直接冲向后台服务器。（这就是<em>为什么你要关注它</em>——一致性哈希就是用来阻止这种灾难的发生。）</p>
+<p>当使用一致性哈希算法进行映射的时候，一切变得完美了：增加一个cache,它会公平地从其他的cache获取映射关系；删除一个cache，原先属于它的映射关系将被公平地分配给集群中其他cache。这就是一致性哈希所做的,尽可能小地改变已存在的映射关系。</p>
+<p>一致性哈希算法的基本思想就是将对象和cache都使用相同的哈希算法。这样，可以实现将cache和对象映射到同一个哈希数值空间。如果移除一个cache,它对应的映射关系将被邻近的一个cache节点接管，其他的cache节点保持不变。</p>
+<h2 id="演示">演示</h2><p>让我们透过细节看本质。哈希算法的作用是将对象和cache映射到一个数值空间。熟悉Java编程的屌丝都很熟悉它，<code>Object.hashCode()</code>方法返回一个从$-2^{31}$ 到 $2^{31}-1$之间的值。想象一下，将这个范围的值映射到一个头尾相接的圆环上。如图所示，将Objects(1,2,3,4) 和 caches(A,B,C)通过哈希值映射到一个圆环上。</p>
+<p><strong>为确定对象的映射的cache，以顺时针方向从对象出发，直到遇见一个cache，那么就将该对象存储到这个cache上。</strong></p>
+<p><img src="/images/post/algorithm/hash_1.png" alt="图1"></p>
+<ul>
+<li><p>从上图可以得到，对象1和对象4属于cache A，对象2属于cache B，对象3属于cache C；</p>
+</li>
+<li><p>假设移除cache C，那么对象3将属于cache A，其他的对象映射关系未发生改变；</p>
+</li>
+<li><p>假设新增cache D，那么对象3和对象4将被映射到cache D，而对象1仍然属于cache A，如图所示。</p>
+</li>
+</ul>
+<p><img src="/images/post/algorithm/hash_2.png" alt="图2"></p>
+<p>除了哈希数值区间段被分配到每个cache的长度是偶然随意的，上述机制会工作得很好。由于本质上的随意性，对象有可能不能被均匀地映射到cache上。为解决这种问题，引入虚拟节点的概念。“虚拟节点”是实际节点在哈希数值空间的复制品。cache无论何时加入，都将在哈希数值空间中创建对应几个虚拟节点。</p>
+<p>通过下图中的模拟实验的数据，展示了虚拟节点的作用。在该次实验中，使用虚拟节点技术将10,000个对象映射到10个cache上。X轴表示每个cache对应的虚拟节点个数(呈对数级分布)。当该值很小的时候，Y轴显示的每个cache映射到的对象数目的标准非常高，由此表明对象映射非常不均衡；增大虚拟节点的数目，映射变得均匀。实验显示每个cache对应100或200个虚拟节点时，映射的均匀程度是可接受的(标准差介于5% - 10%)。</p>
+<p><img src="/images/post/algorithm/hash_3.png" alt="图3"></p>
+<h2 id="实现">实现</h2><p>这儿给出一个Java版的一致性哈希的简单实现。为达到有效的一致性哈希效果，混合性很好的hash函数至关重要。许多Object的<code>hashCode</code>并未满足这一点，很多时候它们只能产生一个小的严格的整型值。所以给出的实现提供了<code>HashFunction</code>接口，允许定制哈希策略。MD5哈希是一个好的选择。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Collection;</span><br><span class="line"><span class="keyword">import</span> java.util.SortedMap;</span><br><span class="line"><span class="keyword">import</span> java.util.TreeMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConsistentHash</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">final</span> HashFunction hashFunction;</span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> numberOfReplicas;</span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">final</span> SortedMap&lt;Integer, T&gt; circle = <span class="keyword">new</span> TreeMap&lt;Integer, T&gt;();</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="title">ConsistentHash</span><span class="params">(HashFunction hashFunction, <span class="keyword">int</span> numberOfReplicas,</span><br><span class="line">     Collection&lt;T&gt; nodes)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">this</span>.hashFunction = hashFunction;</span><br><span class="line">   <span class="keyword">this</span>.numberOfReplicas = numberOfReplicas;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">for</span> (T node : nodes) &#123;</span><br><span class="line">     add(node);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(T node)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numberOfReplicas; i++) &#123;</span><br><span class="line">     circle.put(hashFunction.hash(node.toString() + i), node);</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(T node)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; numberOfReplicas; i++) &#123;</span><br><span class="line">     circle.remove(hashFunction.hash(node.toString() + i));</span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">(Object key)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (circle.isEmpty()) &#123;</span><br><span class="line">     <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">int</span> hash = hashFunction.hash(key);</span><br><span class="line">   <span class="keyword">if</span> (!circle.containsKey(hash)) &#123;</span><br><span class="line">     SortedMap&lt;Integer, T&gt; tailMap = circle.tailMap(hash);</span><br><span class="line">     hash = tailMap.isEmpty() ? circle.firstKey() : tailMap.firstKey();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> circle.get(hash);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码中<code>circle</code>是一个键值顺序存储的Map，key表示哈希值，value对应cache(以<code>T</code>表示)。当<code>ConsistentHash</code>对象被创建时，每个cache被多次添加进<code>circle</code>（具体数目由<code>numberOfReplicas</code>控制）。每个虚拟节点映射的位置通过哈希cache节点和数字后缀来得到，每个真实的cache节点存储到这些虚拟节点对应的虚拟节点上。</p>
+<p>对象的哈希值，被用来从map中寻找映射的cache节点（<code>get</code>方法）。多数情况下，对象的哈希值不会命中<code>circle</code>中已有的节点（因为即便使用虚拟节点，哈希值的空间也远远大于cache节点的数目），此时需要从<code>tail map</code>中寻找第一个键值。如果<code>tail map</code>为空，则从<code>circle</code>环绕寻找第一个命中的哈希值。</p>
+<h2 id="应用">应用</h2><p>那么如何使用一致性哈希？大多数时候，你更想从类库得到它，而非自己编码实现。如上提到的分布式内存缓存系统 memcached，如今已有专门的客户端来提供一致性哈希。由Last.fm 的<a href="http://www.last.fm/user/RJ/" target="_blank" rel="external"> Richard Jones</a> 实现的 <a href="http://www.audioscrobbler.net/development/ketama/" target="_blank" rel="external">ketama</a><sup>[4]</sup>是第一个实现，<a href="http://bleu.west.spy.net/~dustin/" target="_blank" rel="external">Dustin Sallings</a>给出了<a href="https://github.com/dustin/java-memcached-client" target="_blank" rel="external">Java的实现</a><sup>[5]</sup>。需要指出的是，只有客户端需要实现一致性哈希算法，缓存服务端无需改变。其他诸如<a href="https://github.com/sit/dht/wiki" target="_blank" rel="external">Chord</a>【一个分布式哈希表实现】 和 亚马逊的Dynamo 【一个KV存储系统】，都采用了一致性哈希算法。</p>
+<blockquote>
+<h3 id="参考资料：">参考资料：</h3><p>[1] Consistent Hashing：<a href="http://blog.csdn.net/sparkliang/article/details/5279393" title="Consistent Hashing" target="_blank" rel="external">http://blog.csdn.net/sparkliang/article/details/5279393</a></p>
+<p>[2] Consistent Hashing and Random Trees: Distributed Caching Protocols for Relieving Hot Spots on the World Wide Web：<a href="http://dl.acm.org/citation.cfm?id=258660" target="_blank" rel="external">http://dl.acm.org/citation.cfm?id=258660</a></p>
+<p>[3] 亚马逊 Dynamo：<a href="http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html" title="Amazon&#39;s Dynamo" target="_blank" rel="external">http://www.allthingsdistributed.com/2007/10/amazons_dynamo.html</a></p>
+<p>[4] ketama：<a href="http://www.audioscrobbler.net/development/ketama/" target="_blank" rel="external">http://www.audioscrobbler.net/development/ketama/</a></p>
+<p>[5] Dustin Sallings对一致性哈希的Java实现：<a href="https://github.com/dustin/java-memcached-client" target="_blank" rel="external">https://github.com/dustin/java-memcached-client</a></p>
+</blockquote>
+<hr>
+<blockquote>
+<h3 id="译者注:">译者注:</h3><p>原文并未能很好地阐述一致性哈希的思想，推荐阅读如下两篇博文：</p>
+<p>[1]  <a href="http://blog.csdn.net/x15594/article/details/6270242" target="_blank" rel="external">http://blog.csdn.net/x15594/article/details/6270242</a></p>
+<p>[2]  <a href="http://blog.csdn.net/sparkliang/article/details/5279393" target="_blank" rel="external">http://blog.csdn.net/sparkliang/article/details/5279393</a></p>
+</blockquote>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Hash/" rel="tag">#Hash</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/09/27/git-learning/" rel="prev">Git学习资料</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/09/24/hadoop-eclipse-plugin/" rel="next">手动编译Hadoop的Eclipse Plugin</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2013/09/26/consistent-hashing/"
+                   data-title="[译] 一致性哈希算法" data-url="http://yoursite.com/2013/09/26/consistent-hashing/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="http://www.gravatar.com/avatar/f1d8cf8dbe2d0ce8d8255810a3138fa2?s=160" alt="JavanLu" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">JavanLu</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Still Waters Run Deep.</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#演示"><span class="nav-number">1.</span> <span class="nav-text">演示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用"><span class="nav-number">3.</span> <span class="nav-text">应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料："><span class="nav-number">3.1.</span> <span class="nav-text">参考资料：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#译者注:"><span class="nav-number">3.2.</span> <span class="nav-text">译者注:</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2013 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JavanLu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"javansblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,762 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="Still Waters Run Deep." />
+
+
+
+  <meta name="keywords" content="Storm," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="特别注明：本文翻译自 Getting started with Storm 第七章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+有时候你希望使用非JVM语言来实现一个 Storm工程，也许是你使用其他语言感觉更舒服，或者是你想使用其他语言的开发的库。
+Storm 是用 Java 实现的，你之前所看到的本书那些示例 spout 和 bolt 也是用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[译]【Storm入门指南】第七章 在 Storm 中使用非 JVM 语言">
+<meta property="og:url" content="http://yoursite.com/2013/10/17/getting-started-with-storm-chapter-7/index.html">
+<meta property="og:site_name" content="Javan's Blog">
+<meta property="og:description" content="特别注明：本文翻译自 Getting started with Storm 第七章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+有时候你希望使用非JVM语言来实现一个 Storm工程，也许是你使用其他语言感觉更舒服，或者是你想使用其他语言的开发的库。
+Storm 是用 Java 实现的，你之前所看到的本书那些示例 spout 和 bolt 也是用">
+<meta property="og:updated_time" content="2015-08-08T05:39:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[译]【Storm入门指南】第七章 在 Storm 中使用非 JVM 语言">
+<meta name="twitter:description" content="特别注明：本文翻译自 Getting started with Storm 第七章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+有时候你希望使用非JVM语言来实现一个 Storm工程，也许是你使用其他语言感觉更舒服，或者是你想使用其他语言的开发的库。
+Storm 是用 Java 实现的，你之前所看到的本书那些示例 spout 和 bolt 也是用">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> [译]【Storm入门指南】第七章 在 Storm 中使用非 JVM 语言 | Javan's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Javan's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'hV94zB5BAjdxzas-hytK','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              [译]【Storm入门指南】第七章 在 Storm 中使用非 JVM 语言
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2013-10-17T10:09:00+08:00" content="2013-10-17">
+            2013-10-17
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/技术/" itemprop="url" rel="index">
+                  <span itemprop="name">技术</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2013/10/17/getting-started-with-storm-chapter-7/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2013/10/17/getting-started-with-storm-chapter-7/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>特别注明：本文翻译自 <a href="http://shop.oreilly.com/product/0636920024835.do" target="_blank" rel="external">Getting started with Storm</a> 第七章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。</p>
+</blockquote>
+<p>有时候你希望使用非JVM语言来实现一个 Storm工程，也许是你使用其他语言感觉更舒服，或者是你想使用其他语言的开发的库。</p>
+<p>Storm 是用 Java 实现的，你之前所看到的本书那些示例 spout 和 bolt 也是用Java来编码的。所以能用能用 Python、Ruby 或者 JavaScript 来编写呢？答案是肯定的。通过使用<strong>多语言协议</strong>（<em>multilang protocol</em>） 来实现这种可能。</p>
+<a id="more"></a>
+<p>多语言协议是 Storm 实现的一个特殊协议，使用标准输入输出作为进程间通信通道来完spout和bolt的处理工作。消息被编码成JSON或者简单的文本通过该通道进行传递。</p>
+<p>让我们来看一下一个简单的使用非JVM语言编写的 spout 和 bolt 的实例。有一个用来产生1到10000之间随机数的 spout 和一个过滤质数的 bolt，它们都是用PHP编写的。</p>
+<blockquote>
+<p>本例中，检查质数的方式很幼稚。有很多更好的实现，但是它们太复杂，不在本例讨论的范围内。</p>
+</blockquote>
+<p>有一个针对Storm 的 PHP DLS 官方实现。在本章，我们将展示我们的实现。首先，定义 topology。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">TopologyBuilder builder = <span class="keyword">new</span> TopologyBuilder();</span><br><span class="line">builder.setSpout(<span class="string">"numbers-generator"</span>, <span class="keyword">new</span> NumberGeneratorSpout(<span class="number">1</span>, <span class="number">10000</span>));</span><br><span class="line">builder.setBolt(<span class="string">"prime-numbers-filter"</span>, <span class="keyword">new</span></span><br><span class="line">PrimeNumbersFilterBolt()).shuffleGrouping(<span class="string">"numbers-generator"</span>);</span><br><span class="line">StormTopology topology = builder.createTopology();</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>有一种方式来明确非JVM语言的 topology。由于 Storm topology 是 Thrift 架构，且 Nimbus 是一个 Thrift 守护进程，因此你可以使用任何你想用的语言来创建和提交 topology。但有关讨论超出了本书的范围。</p>
+</blockquote>
+<p>没有任何新东西。来看看<code>NumbersGeneratorSpout</code>的实现。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NumberGeneratorSpout</span> <span class="keyword">extends</span> <span class="title">ShellSpout</span> <span class="keyword">implements</span> <span class="title">IRichSpout</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">NumberGeneratorSpout</span><span class="params">(Integer from, Integer to)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(<span class="string">"php"</span>, <span class="string">"-f"</span>, <span class="string">"NumberGeneratorSpout.php"</span>, from.toString(), to.toString());</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">declareOutputFields</span><span class="params">(OutputFieldsDeclarer declarer)</span> </span>&#123;</span><br><span class="line">		declarer.declare(<span class="keyword">new</span> Fields(<span class="string">"number"</span>));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> Map&lt;String, Object&gt; getComponentConfiguration() &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>你可能注意到，这个 spout 继承了 <code>ShellSpout</code>。这是一个来自 Storm 的特殊类，可以帮助运行和控制用其他语言编写的 spout。在本例中，它告诉 Storm 如何执行 PHP 脚本。</p>
+<p><code>NumberGeneratorSpout</code>的 PHP 脚本发射 tuple到标准输出，读取标准输入来处理应答和失败。</p>
+<p>在浏览<code>NumberGeneratorSpout.php</code>脚本实现之前，我们来看看更多多语言协议的工作细节。</p>
+<p>Spout 产生从<code>from</code>到<code>to</code>的序列号，然后传递给构造函数。</p>
+<p>接着，来看看<code>PrimeNumbersFilterBolt</code>。这个方法实现了之前提到的接口。它告诉 Storm 如何执行 PHP 脚本。Storm 提供了特殊的类<code>ShellBolt</code>来实现该功能，你需要做的唯一的事情是声明怎样运行脚本和发射字段。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrimeNumbersFilterBolt</span> <span class="keyword">extends</span> <span class="title">ShellBolt</span> <span class="keyword">implements</span> <span class="title">IRichBolt</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">PrimeNumbersFilterBolt</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>(<span class="string">"php"</span>, <span class="string">"-f"</span>, <span class="string">"PrimeNumbersFilterBolt.php"</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">declareOutputFields</span><span class="params">(OutputFieldsDeclarer declarer)</span> </span>&#123;</span><br><span class="line">		declarer.declare(<span class="keyword">new</span> Fields(<span class="string">"number"</span>));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在构造函数中，只需要告诉 Storm 如何运行 PHP 脚本。这等于执行如下脚本命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php <span class="operator">-f</span> PrimeNumbersFilterBolt.php</span><br></pre></td></tr></table></figure>
+<p><code>PrimeNumbersFilterBolt</code>的 PHP 脚本从标准输入读取 tuple，处理，发射，应答或失败到标准输出。在浏览<code>PrimeNumbersFilterBolt.php</code>脚本之前，让我们来看看多语言协议是如何工作的。</p>
+<h1 id="7-1_详解多语言协议">7.1 详解多语言协议</h1><p>该协议依赖标准输入输出作为线程间通信的信道。一个脚本需要按照如下步骤来完成工作：</p>
+<ul>
+<li><ol>
+<li>初始握手。</li>
+</ol>
+</li>
+<li><ol>
+<li>开始循环。</li>
+</ol>
+</li>
+<li><ol>
+<li>读写 tuple。</li>
+</ol>
+</li>
+</ul>
+<p>让我们详细查看每一步，以及如何使用PHP脚本去实现。</p>
+<h2 id="7-1-1_初始握手"><strong>7.1.1 初始握手</strong></h2><p>Storm 为了控制处理（启动或结束），需要知道正在运行脚本的进程 ID。根据多语言协议，当进程启动时做的第一件事就是发送一个包含了 Storm 配置、topology 上下文以及 PID 目录的 JSON 对象到标准输入。这个对象有点像如下代码块：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">"conf": &#123;</span><br><span class="line">	"topology.message.timeout.secs": 3,</span><br><span class="line">	// etc</span><br><span class="line">	&#125;,</span><br><span class="line">	"context": &#123;</span><br><span class="line">		"task-&gt;component": &#123;</span><br><span class="line">			"1": "example-spout",</span><br><span class="line">			"2": "__acker",</span><br><span class="line">			"3": "example-bolt"</span><br><span class="line">		&#125;,</span><br><span class="line">		"taskid": 3</span><br><span class="line">	&#125;,</span><br><span class="line">	"pidDir": "..."</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>进程必须在指定的<code>pidDir</code>目录下创建一个以进程ID命名的空文件，将 PID 以 JSON 对象的方式写到标准输出中。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;"<span class="attribute">pid</span>": <span class="value"><span class="number">1234</span></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>比如，当接收到<code>/tmp/exmaple/</code>且脚本的 PID 是<code>123</code>，你应该在<code>/tmp/example/123</code>下创建一个空文件并且打印<code>{&quot;pid&quot;:123}</code>和<code>end</code>到标准输出。Storm 就是这样在关闭进程的时候来持续跟踪 PID 和终止进程的。让我们来看看 PHP 是如何做到的：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$config</span> = json_decode(read_msg(), <span class="keyword">true</span>);</span><br><span class="line"><span class="variable">$heartbeatdir</span> = <span class="variable">$config</span>[<span class="string">'pidDir'</span>];</span><br><span class="line"><span class="variable">$pid</span> = getmypid();</span><br><span class="line">fclose(fopen(<span class="string">"$heartbeatdir/$pid"</span>, <span class="string">"w"</span>));</span><br><span class="line">storm_send([<span class="string">"pid"</span>=&gt;<span class="variable">$pid</span>]);</span><br><span class="line">flush();</span><br></pre></td></tr></table></figure>
+<p>你已经建立了<code>read_msg</code>功能从标准输入来读取消息。多语言协议允许消息可以被编码成JSON的单行或多行。当 Storm 发送单条单词<code>end</code>时，一条消息就完成了。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">read_msg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="variable">$msg</span> = <span class="string">""</span>;</span><br><span class="line">	<span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">		<span class="variable">$l</span> = fgets(STDIN);</span><br><span class="line">		<span class="variable">$line</span> = substr(<span class="variable">$l</span>,<span class="number">0</span>,-<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">if</span>(<span class="variable">$line</span>==<span class="string">"end"</span>) &#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="variable">$msg</span> = <span class="string">"$msg$line\n"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> substr(<span class="variable">$msg</span>, <span class="number">0</span>, -<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">storm_send</span><span class="params">(<span class="variable">$json</span>)</span> </span>&#123;</span><br><span class="line">	write_line(json_encode(<span class="variable">$json</span>));</span><br><span class="line">	write_line(<span class="string">"end"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">write_line</span><span class="params">(<span class="variable">$line</span>)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">echo</span>(<span class="string">"$line\n"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>调用<code>flush</code>是非常重要的。可能存在一个直到字符数累计到一定数量才会被刷新的缓冲区。这意味着你的脚本可能会被一直挂起，等待来自Storm的输入。它永远不会被接收，因为Storm在等待来自你脚本的输出。因此确保当你的脚本有输出时及时刷新是重要的。</p>
+</blockquote>
+<h2 id="7-1-2_开始循环并读写_Tuple"><strong>7.1.2 开始循环并读写 Tuple</strong></h2><p>这是最重要的一步，在这里所有工作被完成。该步的实现取决于你在开发一个 spout 或是 bolt。</p>
+<p>在 spout 情形下，你需要开始发射 tuple。在 bolt 情形下，循环读取tuple、处理并发射它们、ack 或 fail。</p>
+<p>让我们看看 spout 发射数字的实现。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$from</span> = intval(<span class="variable">$argv</span>[<span class="number">1</span>]);</span><br><span class="line"><span class="variable">$to</span> = intval(<span class="variable">$argv</span>[<span class="number">2</span>]);</span><br><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">	<span class="variable">$msg</span> = read_msg();</span><br><span class="line">	<span class="variable">$cmd</span> = json_decode(<span class="variable">$msg</span>, <span class="keyword">true</span>);</span><br><span class="line">	<span class="keyword">if</span> (<span class="variable">$cmd</span>[<span class="string">'command'</span>]==<span class="string">'next'</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="variable">$from</span>&lt;<span class="variable">$to</span>) &#123;</span><br><span class="line">			storm_emit(<span class="keyword">array</span>(<span class="string">"$from"</span>));</span><br><span class="line">			<span class="variable">$task_ids</span> = read_msg();</span><br><span class="line">			<span class="variable">$from</span>++;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			sleep(<span class="number">1</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	storm_sync();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从命令行中获取<code>from</code>和<code>to</code>参数，然后开始循环。每当从 Storm 获取到一个<code>next</code>消息，意味着准备开始发射一个新的 tuple。</p>
+<p>当发射完所有的数字并且没有更多的 tuple 需要发送的话，休眠一段时间。</p>
+<p>为了保证脚本已经为准备好下一个 tuple，在发射下一个之前等待<code>sync</code>指令。使用<code>read_msg()</code>读取指令并按照 JSON 格式编码。</p>
+<p>在本例中，bolt 有所不同。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">	<span class="variable">$msg</span> = read_msg();</span><br><span class="line">	<span class="variable">$tuple</span> = json_decode(<span class="variable">$msg</span>, <span class="keyword">true</span>, <span class="number">512</span>, JSON_BIGINT_AS_STRING);</span><br><span class="line">	<span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$tuple</span>[<span class="string">"id"</span>])) &#123;</span><br><span class="line">		<span class="keyword">if</span> (isPrime(<span class="variable">$tuple</span>[<span class="string">"tuple"</span>][<span class="number">0</span>])) &#123;</span><br><span class="line">			storm_emit(<span class="keyword">array</span>(<span class="variable">$tuple</span>[<span class="string">"tuple"</span>][<span class="number">0</span>]));</span><br><span class="line">		&#125;</span><br><span class="line">		storm_ack(<span class="variable">$tuple</span>[<span class="string">"id"</span>]);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>循环从标准输入读取 tuple。获取到消息后，使用 JSON 格式解码。如果是一个 tuple，处理它并检查是否是一个质数。如果是质数，将数字发射出去；否则忽略。</p>
+<p>不论如何，都对 tuple 作应答。</p>
+<blockquote>
+<p>在    <code>json_decode</code>中使用<code>JSON_BIGINT_AS_STRING</code>参数，是为了解决 Java 和 PHP 之间的转换问题。Java 发送某些很大的数字，然而这些数字在 PHP 解析时会丢失精度，这就有问题了。为了解决这个问题，告诉 PHP 把大数字解析成字符串，并且在JSON消息中禁止对该字符串使用双引号。PHP 5.4.0 或者更高版本，需要这个参数才能正常工作。</p>
+</blockquote>
+<p><code>emit</code>、<code>ack</code>、<code>fail</code>和<code>log</code>的格式如下：</p>
+<p><strong>Emit</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	"<span class="attribute">command</span>": <span class="value"><span class="string">"emit"</span></span>,</span><br><span class="line">	"<span class="attribute">tuple</span>": <span class="value">[<span class="string">"foo"</span>, <span class="string">"bar"</span>]</span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>tuple 数组中是发射的值。</p>
+<p><strong>Ack</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	"<span class="attribute">command</span>": <span class="value"><span class="string">"ack"</span></span>,</span><br><span class="line">	"<span class="attribute">id</span>": <span class="value"><span class="number">123456789</span></span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>id 是要处理的 tuple 的 ID。</p>
+<p><strong>Fail</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	"<span class="attribute">command</span>": <span class="value"><span class="string">"fail"</span></span>,</span><br><span class="line">	"<span class="attribute">id</span>": <span class="value"><span class="number">123456789</span></span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>和 Ack 一样，id 是要处理的 tuple 的 ID。</p>
+<p><strong>Log</strong></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	"<span class="attribute">command</span>": <span class="value"><span class="string">"log"</span></span>,</span><br><span class="line">	"<span class="attribute">msg</span>": <span class="value"><span class="string">"some message to be logged by storm."</span></span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>下面给出所有的 PHP 脚本。</p>
+<p>Spout:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">read_msg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="variable">$msg</span> = <span class="string">""</span>;</span><br><span class="line">	<span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">		<span class="variable">$l</span> = fgets(STDIN);</span><br><span class="line">		<span class="variable">$line</span> = substr(<span class="variable">$l</span>,<span class="number">0</span>,-<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">if</span> (<span class="variable">$line</span>==<span class="string">"end"</span>) &#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="variable">$msg</span> = <span class="string">"$msg$line\n"</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> substr(<span class="variable">$msg</span>, <span class="number">0</span>, -<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">write_line</span><span class="params">(<span class="variable">$line</span>)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">echo</span>(<span class="string">"$line\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">storm_emit</span><span class="params">(<span class="variable">$tuple</span>)</span> </span>&#123;</span><br><span class="line">	<span class="variable">$msg</span> = <span class="keyword">array</span>(<span class="string">"command"</span> =&gt; <span class="string">"emit"</span>, <span class="string">"tuple"</span> =&gt; <span class="variable">$tuple</span>);</span><br><span class="line">	storm_send(<span class="variable">$msg</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">storm_send</span><span class="params">(<span class="variable">$json</span>)</span> </span>&#123;</span><br><span class="line">	write_line(json_encode(<span class="variable">$json</span>));</span><br><span class="line">	write_line(<span class="string">"end"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">storm_sync</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	storm_send(<span class="keyword">array</span>(<span class="string">"command"</span> =&gt; <span class="string">"sync"</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">storm_log</span><span class="params">(<span class="variable">$msg</span>)</span> </span>&#123;</span><br><span class="line">	<span class="variable">$msg</span> = <span class="keyword">array</span>(<span class="string">"command"</span> =&gt; <span class="string">"log"</span>, <span class="string">"msg"</span> =&gt; <span class="variable">$msg</span>);</span><br><span class="line">	storm_send(<span class="variable">$msg</span>);</span><br><span class="line">	flush();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$config</span> = json_decode(read_msg(), <span class="keyword">true</span>);</span><br><span class="line"><span class="variable">$heartbeatdir</span> = <span class="variable">$config</span>[<span class="string">'pidDir'</span>];</span><br><span class="line"></span><br><span class="line"><span class="variable">$pid</span> = getmypid();</span><br><span class="line">fclose(fopen(<span class="string">"$heartbeatdir/$pid"</span>, <span class="string">"w"</span>));</span><br><span class="line">storm_send([<span class="string">"pid"</span>=&gt;<span class="variable">$pid</span>]);</span><br><span class="line">flush();</span><br><span class="line"></span><br><span class="line"><span class="variable">$from</span> = intval(<span class="variable">$argv</span>[<span class="number">1</span>]);</span><br><span class="line"><span class="variable">$to</span> = intval(<span class="variable">$argv</span>[<span class="number">2</span>]);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">	<span class="variable">$msg</span> = read_msg();</span><br><span class="line">	<span class="variable">$cmd</span> = json_decode(<span class="variable">$msg</span>, <span class="keyword">true</span>);</span><br><span class="line">	<span class="keyword">if</span> (<span class="variable">$cmd</span>[<span class="string">'command'</span>]==<span class="string">'next'</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="variable">$from</span>&lt;<span class="variable">$to</span>) &#123;</span><br><span class="line">			storm_emit(<span class="keyword">array</span>(<span class="string">"$from"</span>));</span><br><span class="line">			<span class="variable">$task_ids</span> = read_msg();</span><br><span class="line">			<span class="variable">$from</span>++;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			sleep(<span class="number">1</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	storm_sync();</span><br><span class="line">&#125;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>Bolt:</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="preprocessor">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isPrime</span><span class="params">(<span class="variable">$number</span>)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (<span class="variable">$number</span> &lt; <span class="number">2</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (<span class="variable">$number</span>==<span class="number">2</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (<span class="variable">$i</span>=<span class="number">2</span>; <span class="variable">$i</span>&lt;=<span class="variable">$number</span>-<span class="number">1</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="variable">$number</span> % <span class="variable">$i</span> == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">read_msg</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="variable">$msg</span> = <span class="string">""</span>;</span><br><span class="line">	<span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">		<span class="variable">$l</span> = fgets(STDIN);</span><br><span class="line">		<span class="variable">$line</span> = substr(<span class="variable">$l</span>,<span class="number">0</span>,-<span class="number">1</span>);</span><br><span class="line">		<span class="keyword">if</span> (<span class="variable">$line</span>==<span class="string">"end"</span>) &#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="variable">$msg</span> = <span class="string">"$msg$line\n"</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">return</span> substr(<span class="variable">$msg</span>, <span class="number">0</span>, -<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">write_line</span><span class="params">(<span class="variable">$line</span>)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">echo</span>(<span class="string">"$line\n"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">storm_emit</span><span class="params">(<span class="variable">$tuple</span>)</span> </span>&#123;</span><br><span class="line">	<span class="variable">$msg</span> = <span class="keyword">array</span>(<span class="string">"command"</span> =&gt; <span class="string">"emit"</span>, <span class="string">"tuple"</span> =&gt; <span class="variable">$tuple</span>);</span><br><span class="line">	storm_send(<span class="variable">$msg</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">storm_send</span><span class="params">(<span class="variable">$json</span>)</span> </span>&#123;</span><br><span class="line">	write_line(json_encode(<span class="variable">$json</span>));</span><br><span class="line">	write_line(<span class="string">"end"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">storm_ack</span><span class="params">(<span class="variable">$id</span>)</span> </span>&#123;</span><br><span class="line">	storm_send([<span class="string">"command"</span>=&gt;<span class="string">"ack"</span>, <span class="string">"id"</span>=&gt;<span class="string">"$id"</span>]);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">storm_log</span><span class="params">(<span class="variable">$msg</span>)</span> </span>&#123;</span><br><span class="line">	<span class="variable">$msg</span> = <span class="keyword">array</span>(<span class="string">"command"</span> =&gt; <span class="string">"log"</span>, <span class="string">"msg"</span> =&gt; <span class="string">"$msg"</span>);</span><br><span class="line">	storm_send(<span class="variable">$msg</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$config</span> = json_decode(read_msg(), <span class="keyword">true</span>);</span><br><span class="line"><span class="variable">$heartbeatdir</span> = <span class="variable">$config</span>[<span class="string">'pidDir'</span>];</span><br><span class="line"></span><br><span class="line"><span class="variable">$pid</span> = getmypid();</span><br><span class="line">fclose(fopen(<span class="string">"$heartbeatdir/$pid"</span>, <span class="string">"w"</span>));</span><br><span class="line">storm_send([<span class="string">"pid"</span>=&gt;<span class="variable">$pid</span>]);</span><br><span class="line">flush();</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">	<span class="variable">$msg</span> = read_msg();</span><br><span class="line">	<span class="variable">$tuple</span> = json_decode(<span class="variable">$msg</span>, <span class="keyword">true</span>, <span class="number">512</span>, JSON_BIGINT_AS_STRING);</span><br><span class="line">	<span class="keyword">if</span> (!<span class="keyword">empty</span>(<span class="variable">$tuple</span>[<span class="string">"id"</span>])) &#123;</span><br><span class="line">		<span class="keyword">if</span> (isPrime(<span class="variable">$tuple</span>[<span class="string">"tuple"</span>][<span class="number">0</span>])) &#123;</span><br><span class="line">			storm_emit(<span class="keyword">array</span>(<span class="variable">$tuple</span>[<span class="string">"tuple"</span>][<span class="number">0</span>]));</span><br><span class="line">		&#125;</span><br><span class="line">		storm_ack(<span class="variable">$tuple</span>[<span class="string">"id"</span>]);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="preprocessor">?&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>务必将上面所有脚本放到工程的<code>multilang/resources</code>目录下。这个目录会被包含在JAR包中发送到工作者。如果你没有将脚本放置到该目录，Storm 将会出错且不会运行它们。</p>
+</blockquote>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Storm/" rel="tag">#Storm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/10/18/getting-started-with-storm-chapter-8/" rel="prev">[译]【Storm入门指南】第八章 事务 Topologies</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/10/17/getting-started-with-storm-chapter-6/" rel="next">[译]【Storm入门指南】第六章 真实示例</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2013/10/17/getting-started-with-storm-chapter-7/"
+                   data-title="[译]【Storm入门指南】第七章 在 Storm 中使用非 JVM 语言" data-url="http://yoursite.com/2013/10/17/getting-started-with-storm-chapter-7/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="http://www.gravatar.com/avatar/f1d8cf8dbe2d0ce8d8255810a3138fa2?s=160" alt="JavanLu" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">JavanLu</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Still Waters Run Deep.</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#7-1_详解多语言协议"><span class="nav-number">1.</span> <span class="nav-text">7.1 详解多语言协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-1_初始握手"><span class="nav-number">1.1.</span> <span class="nav-text">7.1.1 初始握手</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-2_开始循环并读写_Tuple"><span class="nav-number">1.2.</span> <span class="nav-text">7.1.2 开始循环并读写 Tuple</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2013 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JavanLu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"javansblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

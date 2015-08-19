@@ -1,0 +1,801 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="Still Waters Run Deep." />
+
+
+
+  <meta name="keywords" content="Storm," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="特别注明：本文翻译自 Getting started with Storm 第二章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+本章将演示创建一个 Storm 工程和第一个 topology。
+
+下文是建立在你的机器上安装有 JRE 1.6 及以上的环境。建议使用Oralce JRE，可从 http://www.java.com/download">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[译]【Storm入门指南】第二章 入门实例">
+<meta property="og:url" content="http://yoursite.com/2013/10/15/getting-started-with-storm-chapter-2/index.html">
+<meta property="og:site_name" content="Javan's Blog">
+<meta property="og:description" content="特别注明：本文翻译自 Getting started with Storm 第二章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+本章将演示创建一个 Storm 工程和第一个 topology。
+
+下文是建立在你的机器上安装有 JRE 1.6 及以上的环境。建议使用Oralce JRE，可从 http://www.java.com/download">
+<meta property="og:image" content="http://yoursite.com/images/post/storm/chapter2/fig2_1.png">
+<meta property="og:updated_time" content="2015-08-08T05:38:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[译]【Storm入门指南】第二章 入门实例">
+<meta name="twitter:description" content="特别注明：本文翻译自 Getting started with Storm 第二章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+本章将演示创建一个 Storm 工程和第一个 topology。
+
+下文是建立在你的机器上安装有 JRE 1.6 及以上的环境。建议使用Oralce JRE，可从 http://www.java.com/download">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> [译]【Storm入门指南】第二章 入门实例 | Javan's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Javan's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'hV94zB5BAjdxzas-hytK','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              [译]【Storm入门指南】第二章 入门实例
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2013-10-15T07:54:00+08:00" content="2013-10-15">
+            2013-10-15
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/技术/" itemprop="url" rel="index">
+                  <span itemprop="name">技术</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2013/10/15/getting-started-with-storm-chapter-2/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2013/10/15/getting-started-with-storm-chapter-2/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>特别注明：本文翻译自 <a href="http://shop.oreilly.com/product/0636920024835.do" target="_blank" rel="external">Getting started with Storm</a> 第二章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。</p>
+</blockquote>
+<p>本章将演示创建一个 Storm 工程和第一个 topology。</p>
+<blockquote>
+<p>下文是建立在你的机器上安装有 JRE 1.6 及以上的环境。建议使用Oralce JRE，可从 <a href="htttp://www.java.com/download" target="_blank" rel="external">http://www.java.com/download</a> 获得。</p>
+</blockquote>
+<h1 id="2-1_运行模式">2.1 运行模式</h1><p>在开始之前，理解 Storm 的运行模式很重要。Storm 有两种运行模式。</p>
+<a id="more"></a>
+<h2 id="2-1-1_本地模式"><strong>2.1.1 本地模式</strong></h2><p>在本地模式中，Storm 运行在本地机器上的一个JVM中。由于可以方便看到所有 topology 组件的运行信息，这种模式可用来开发、测试调试。在这种模式下，可以调整参数来观察 topology 在不同的 Storm 配置环境下的运行状况。为了在本地模式下运行 topology，我们仅需将运行和测试 topology 的 Storm 相关依赖下载下来。一会创建第一个 Storm 工程的时候，将会看到发生了什么。</p>
+<blockquote>
+<p>在本地模式下运行 topology 与集群环境下很相似。但是重要的一点是：<strong>确保所有组件都是线程安全的</strong>。因为当将 topology 部署到在远程模式时，它们将运行在不同物理机上的不同JVM时，不能够直接交流和共享内存。</p>
+</blockquote>
+<p>本章的所有实例，都运行在本地模式下。</p>
+<h2 id="2-1-2_远程模式"><strong>2.1.2 远程模式</strong></h2><p>在远程模式中，我们将 topology 提交到 Storm 集群，通常是运行在不同机器上由许多处理组件组成 。远程模式不显示调试信息，这也是为什么它被认为是生产模式。然而，我们也可能在一台开发机器上创建 Storm 集群。在部署到生产环境之前，最好这样做以便验证在生产环境下运行 topology 是否会有问题。  </p>
+<p>你将在<a href="http://javanlu.github.io/blog/2013/10/14/getting-started-with-storm-chapter-6/" target="_blank" rel="external">第六章</a>学习远程模式，我将在<a href="http://javanlu.github.io/blog/2013/10/14/getting-started-with-storm-appendix-a/" target="_blank" rel="external">附录A</a>中演示如何安装一个集群。</p>
+<h1 id="2-2_Storm，你好！">2.2 Storm，你好！</h1><p>在本节，我们将创建一个简单的用来统计单词频率的 topology。我们可以将此视为 Storm topology 的 “Hello World” 项目。然而，由于可扩展到任意无穷数目的机器上，它的威力无穷。并且，只需要一点点改动，我们就能够在此基础上创建出一个统计系统。作为示例，我们将展示如何修改这个项目让它来确定Twitter上的流行话题。</p>
+<p>为了创建 topology，我们使用一个 spout 负责读取单词，一个 bolt 将单词转换成小写的，另一个 bolt 统计单词频率。[如图2.1所示]</p>
+<p><img src="/images/post/storm/chapter2/fig2_1.png" alt="图2.1"></p>
+<p>本示例的代码可从 <a href="http://github.com/storm-book/examples-ch02-getting_started/zipball/master" target="_blank" rel="external">http://github.com/storm-book/examples-ch02-getting_started/zipball/master</a> 下载。</p>
+<blockquote>
+<p>如果你使用 <a href="http://git-scm.com" target="_blank" rel="external">Git</a>，你可以运行 <code>git clone git@github.com:storm-book/examples-ch02-getting_started</code> 将其拉到你想要保存的目录中。</p>
+</blockquote>
+<h2 id="2-2-1_检查Java安装"><strong>2.2.1 检查Java安装</strong></h2><p>第一步设置环境的工作是检查Java版本。打开一个终端，运行<code>java -version</code>指令，可以看到如下一些相似的信息：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br><span class="line"></span><br><span class="line">java version <span class="string">"1.6.0_26"</span></span><br><span class="line">Java(TM) SE Runtime Environment (build <span class="number">1.6</span>.<span class="number">0</span>_26-b03)</span><br><span class="line">Java HotSpot(TM) Server VM (build <span class="number">20.1</span>-b02, mixed mode)</span><br></pre></td></tr></table></figure>
+<p>如果不是，请检查你安装的Java。</p>
+<h2 id="2-2-2_创建工程"><strong>2.2.2 创建工程</strong></h2><p>第一步，创建一个应用的目录（像所有Java应用那样），这个目录将包含工程的源码。</p>
+<p>下一步，下载 Storm 依赖相关的 Jar 包，并把它们加入工程的 classpath。有两种方式：</p>
+<ul>
+<li>下载依赖，解压，加入classpath</li>
+<li>使用 <a href="http://maven.apache.org" target="_blank" rel="external">Apache Maven</a></li>
+</ul>
+<blockquote>
+<p>Maven 是一个软件项目综合管理工具。它可以用来管理一个项目开发周期的几个方面，从依赖到发布构建处理。本书我们将普遍地使用它。通过运行<code>mvn</code>来检查 Maven 是否已安装。如果没有，你可以从Apache Maven 官方主页下来。(<a href="http://maven.apache.org" target="_blank" rel="external">http://maven.apache.org</a>)<br>你不要成为 Maven 方面的专家从而使用 Storm。但是如果能够理解 Maven 运行的基本原理，将会很有用。你可以从Apache Maven 官方主页(<a href="http://maven.apache.org" target="_blank" rel="external">http://maven.apache.org</a>)找到更多有用的信息。</p>
+</blockquote>
+<p>我们需要使用一个 pom.xml 文件来定义工程结构，该文件用来描述依赖、打包、源码等等。我们使用 <a href="http://github.com/nathanmarz" target="_blank" rel="external">nathanmarz</a>设置的依赖和Maven仓库，可以从如下网页找到<a href="https://github.com/nathanmarz/storm/wiki/Maven" target="_blank" rel="external">https://github.com/nathanmarz/storm/wiki/Maven</a>。</p>
+<blockquote>
+<p>Storm 的 Maven 依赖包含所有本地模式下运行 Storm 的库。</p>
+</blockquote>
+<p>我们可以使用这些依赖，编写一个包含可运行我们的topology所需的基本组件的 pom.xml 文件。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">project</span> <span class="attribute">xmlns</span>=<span class="value">"http://maven.apache.org/POM/4.0.0"</span></span><br><span class="line">		<span class="attribute">xmlns:xsi</span>=<span class="value">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">		<span class="attribute">xsi:schemaLocation</span>=<span class="value">"http://maven.apache.org/POM/4.0.0</span><br><span class="line">		http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="title">modelVersion</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">groupId</span>&gt;</span>storm.book<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>Getting-Started<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">version</span>&gt;</span>0.0.1-SNAPSHOT<span class="tag">&lt;/<span class="title">version</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">build</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">plugins</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">plugin</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>maven-compiler-plugin<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="title">version</span>&gt;</span>2.3.2<span class="tag">&lt;/<span class="title">version</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="title">configuration</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="title">source</span>&gt;</span>1.6<span class="tag">&lt;/<span class="title">source</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="title">target</span>&gt;</span>1.6<span class="tag">&lt;/<span class="title">target</span>&gt;</span></span><br><span class="line">					<span class="tag">&lt;<span class="title">compilerVersion</span>&gt;</span>1.6<span class="tag">&lt;/<span class="title">compilerVersion</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;/<span class="title">configuration</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="title">plugin</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="title">plugins</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="title">build</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">repositories</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- Repository where we can found the storm dependencies --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">repository</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">id</span>&gt;</span>clojars.org<span class="tag">&lt;/<span class="title">id</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">url</span>&gt;</span>http://clojars.org/repo<span class="tag">&lt;/<span class="title">url</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="title">repository</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="title">repositories</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">dependencies</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- Storm Dependency --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">groupId</span>&gt;</span>storm<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>storm<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">version</span>&gt;</span>0.6.0<span class="tag">&lt;/<span class="title">version</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="title">dependencies</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>前面几行定义了工程的名称的版本，然后增加了一个编译插件用来告诉 Maven 如何编译我们的代码。接着定义仓库（Maven 支持一个项目中定义多个仓库）。clojars 是Storm依赖所在的仓库。Maven 会自动下载本地模式下运行Storm 所需的所有的子依赖。</p>
+<p>项目将有如下的 Maven Java 工程典型的结构：</p>
+<pre><code>our-application-folder/
+    ├── pom.xml
+    └── src
+        └── main
+            └── java
+            <span class="string">|     ├── spouts</span>
+            <span class="string">|     └── bolts</span>
+            └── resources
+</code></pre><p>Java下面的目录将包含源码，单词文件将被放到 resource 目录。</p>
+<blockquote>
+<p>执行 <code>mkdir -p create</code>创建所需的父目录。</p>
+</blockquote>
+<h1 id="2-3_创建第一个_Topology">2.3 创建第一个 Topology</h1><p>我们将创建一个处理单词计数的topology。可能本例子中的某些部分在本章不会详细介绍，但是会再接下来的章节阐述清楚。</p>
+<h2 id="2-3-1_Spout"><strong>2.3.1 Spout</strong></h2><p><code>WordReader</code> spout 是一个实现了 <code>IRichSpout</code>的类。我们将在<a href="http://javanlu.github.io/blog/2013/10/14/getting-started-with-storm-chapter-4/" target="_blank" rel="external">第四章</a>介绍更多细节。<code>WordReader</code>负责读取文件、把每行文本传送至bolt。</p>
+<blockquote>
+<p>spout 发射一组字段定义了的列表。这种结构允许不同类型的 bolt 读取相同 spout 的数据流，并定义字段供其他 bolt 做后续处理。</p>
+</blockquote>
+<p>示例2-1 包括了该类的所有代码。</p>
+<figure class="highlight java"><figcaption><span>示例2-1：src/main/java/spouts/WordReader.java</span><a href="https://github.com/storm-book/examples-ch02-getting_started/blob/master/src/main/java/spouts/WordReader.java" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> spouts;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"><span class="keyword">import</span> java.io.FileNotFoundException;</span><br><span class="line"><span class="keyword">import</span> java.io.FileReader;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.spout.SpoutOutputCollector;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.task.TopologyContext;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.topology.IRichSpout;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.topology.OutputFieldsDeclarer;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.tuple.Fields;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.tuple.Values;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WordReader</span> <span class="keyword">implements</span> <span class="title">IRichSpout</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> SpoutOutputCollector collector;</span><br><span class="line">	<span class="keyword">private</span> FileReader fileReader;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">boolean</span> completed = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">private</span> TopologyContext context;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isDistributed</span><span class="params">()</span> </span>&#123;<span class="keyword">return</span> <span class="keyword">false</span>;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ack</span><span class="params">(Object msgId)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"OK:"</span>+msgId);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fail</span><span class="params">(Object msgId)</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"FAIL:"</span>+msgId);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * The only thing that the methods will do It is emit each </span><br><span class="line">	 * file line</span><br><span class="line">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">nextTuple</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">/**</span><br><span class="line">		 * The nextuple it is called forever, so if we have been readed the file</span><br><span class="line">		 * we will wait and then return</span><br><span class="line">		 */</span></span><br><span class="line">		<span class="keyword">if</span>(completed)&#123;</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">			&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">				<span class="comment">//Do nothing</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		String str;</span><br><span class="line">		<span class="comment">//Open the reader</span></span><br><span class="line">		BufferedReader reader = <span class="keyword">new</span> BufferedReader(fileReader);</span><br><span class="line">		<span class="keyword">try</span>&#123;</span><br><span class="line">			<span class="comment">//Read all lines</span></span><br><span class="line">			<span class="keyword">while</span>((str = reader.readLine()) != <span class="keyword">null</span>)&#123;</span><br><span class="line">				<span class="comment">/**</span><br><span class="line">				 * By each line emmit a new value with the line as a their</span><br><span class="line">				 */</span></span><br><span class="line">				<span class="keyword">this</span>.collector.emit(<span class="keyword">new</span> Values(str),str);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Error reading tuple"</span>,e);</span><br><span class="line">		&#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">			completed = <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * We will create the file and get the collector object</span><br><span class="line">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">open</span><span class="params">(Map conf, TopologyContext context,</span><br><span class="line">			SpoutOutputCollector collector)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">this</span>.context = context;</span><br><span class="line">			<span class="keyword">this</span>.fileReader = <span class="keyword">new</span> FileReader(conf.get(<span class="string">"wordsFile"</span>).toString());</span><br><span class="line">		&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Error reading file ["</span>+conf.get(<span class="string">"wordFile"</span>)+<span class="string">"]"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">this</span>.collector = collector;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * Declare the output field "word"</span><br><span class="line">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">declareOutputFields</span><span class="params">(OutputFieldsDeclarer declarer)</span> </span>&#123;</span><br><span class="line">		declarer.declare(<span class="keyword">new</span> Fields(<span class="string">"line"</span>));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>spout 中第一个被调用的方法是<code>public void open(Map conf, TopologyContext context, SpoutOutputCollector collector)</code>。参数解释：<code>TopologyContext</code>，包含所有的 topology 数据；<code>conf</code>对象，topology 定义中创建的；<code>SpoutOutputCollector</code>，发射数据供 bolt 处理。下面的代码块是其具体实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">open</span><span class="params">(Map conf, TopologyContext context,</span><br><span class="line">		SpoutOutputCollector collector)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">this</span>.context = context;</span><br><span class="line">		<span class="keyword">this</span>.fileReader = <span class="keyword">new</span> FileReader(conf.get(<span class="string">"wordsFile"</span>).toString());</span><br><span class="line">	&#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Error reading file ["</span>+conf.get(<span class="string">"wordFile"</span>)+<span class="string">"]"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">this</span>.collector = collector;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在该方法中，我们也创建了用来读取文件的<code>reader</code>。下一个需要实现的方法是 <code>public void nextTuple()</code>，通过该方法发射可被 bolt 的数据。在我们的例子中，该方法将读取文件并发射每一行内容。 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">nextTuple</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(completed)&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">			<span class="comment">//Do nothing</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	String str;</span><br><span class="line">	BufferedReader reader = <span class="keyword">new</span> BufferedReader(fileReader);</span><br><span class="line">	<span class="keyword">try</span>&#123;</span><br><span class="line">		<span class="keyword">while</span>((str = reader.readLine()) != <span class="keyword">null</span>)&#123;</span><br><span class="line">			<span class="keyword">this</span>.collector.emit(<span class="keyword">new</span> Values(str),str);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Error reading tuple"</span>,e);</span><br><span class="line">	&#125;<span class="keyword">finally</span>&#123;</span><br><span class="line">		completed = <span class="keyword">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>Values</code>是一种实现<code>ArrayList</code>功能的结构，列表中的元素传入构造函数。</p>
+</blockquote>
+<p><code>nextTuple()</code>与<code>ack()</code>、<code>fail()</code>一起被周期性地调用。当没有任务需要处理的时候，它必须释放线程控制，这样其他方法有机会被调用。所以<code>nextTuple</code>的第一行代码用来检查处理是否已完成：如果完成，线程睡眠至少1000毫秒从而在处理返回之前减少负载；如果还有任务需要被处理，文件中的每一行文本将被读取并发射出去。</p>
+<blockquote>
+<p>一个元组（tuple）是一组数值列表，数值可以是任意类型的可被序列化的Java对象。默认情况下，Storm可以序列化如 <code>strings</code>、<code>byte arrays</code>、<code>ArrayList</code>、<code>HashMap</code>和<code>HashSet</code>等类型。</p>
+</blockquote>
+<h2 id="2-3-2_Bolts"><strong>2.3.2 Bolts</strong></h2><p>现在，我们拥有一个 spout 来读取文件并每行为一个<em>tuple</em>发射出去。接下来要做的就是创建两个 bolt 来处理这些 tuple。这些 bolt 实现 backtype.storm.topology.IRichBolt 接口。</p>
+<p>bolt 中最重要的方法是 <code>execute(Tuple input)</code>，每接收一个tuple就被调用一次。bolt 在接收一个tuple后，可发射若干个 tuple。</p>
+<blockquote>
+<p>一个 bolt 或 spout 可以根据需要反射足够多的 tuple。当 <code>nextTuple</code>被执行时，它们可以发射0个、1个或者多个 tuple。你可以从<a href="http://javanlu.github.io/blog/2013/10/14/getting-started-with-storm-chapter-5/" target="_blank" rel="external">第五章</a>获得更多细节。</p>
+</blockquote>
+<p>第一个 bolt 是 <code>WordNormalizer</code>，用来处理每行文本并将其规范化，将文本分解成单词、转换成小写字母并去除头尾空字符。</p>
+<p>首先，我们需要声明 bolt 输出的参数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">declareOutputFields</span><span class="params">(OutputFieldsDeclarer declarer)</span> </span>&#123;</span><br><span class="line">	declarer.declare(<span class="keyword">new</span> Fields(<span class="string">"word"</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里，我们声明 bolt 将发射一个名字 word 的字段。</p>
+<p>接下来，实现<code>public void execute(Tuple input)</code>方法来处理tuple：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Tuple input)</span> </span>&#123;</span><br><span class="line">        String sentence = input.getString(<span class="number">0</span>);</span><br><span class="line">        String[] words = sentence.split(<span class="string">" "</span>);</span><br><span class="line">        <span class="keyword">for</span>(String word : words)&#123;</span><br><span class="line">            word = word.trim();</span><br><span class="line">            <span class="keyword">if</span>(!word.isEmpty())&#123;</span><br><span class="line">                word = word.toLowerCase();</span><br><span class="line">                collector.emit(<span class="keyword">new</span> Values(word));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>第一行，从tuple中读取值，值可以按照位置或者名称来取得。值会被处理然后使用 collector 对象发射出去。当每个 tuple 被处理后，collector 的<code>ack()</code>方法被调用来表明处理成功执行。如果 tuple 不能被处理，collector 的<code>fail()</code>方法将被调用。</p>
+<p>示例2-2包含了这个类的全部代码：</p>
+<figure class="highlight java"><figcaption><span>示例2-2：src/main/java/bolts/WordNormalizer.java</span><a href="https://github.com/storm-book/examples-ch02-getting_started/blob/master/src/main/java/bolts/WordNormalizer.java" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> bolts;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> backtype.storm.task.OutputCollector;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.task.TopologyContext;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.topology.IRichBolt;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.topology.OutputFieldsDeclarer;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.tuple.Fields;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.tuple.Tuple;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.tuple.Values;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WordNormalizer</span> <span class="title">implement</span> <span class="title">IRichBolt</span> </span>&#123;</span><br><span class="line">	<span class="keyword">private</span> OutputCollector collector;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cleanup</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * The bolt will receive the line from the</span><br><span class="line">	 * words file and process it to Normalize this line</span><br><span class="line">	 * </span><br><span class="line">	 * The normalize will be put the words in lower case</span><br><span class="line">	 * and split the line to get all words in this </span><br><span class="line">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Tuple input)</span> </span>&#123;</span><br><span class="line">        String sentence = input.getString(<span class="number">0</span>);</span><br><span class="line">        String[] words = sentence.split(<span class="string">" "</span>);</span><br><span class="line">        <span class="keyword">for</span>(String word : words)&#123;</span><br><span class="line">            word = word.trim();</span><br><span class="line">            <span class="keyword">if</span>(!word.isEmpty())&#123;</span><br><span class="line">                word = word.toLowerCase();</span><br><span class="line">				<span class="comment">//Emit the word</span></span><br><span class="line">				List a = <span class="keyword">new</span> ArrayList();</span><br><span class="line">				a.add(input);</span><br><span class="line">                collector.emit(a,<span class="keyword">new</span> Values(word));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">		<span class="comment">// Acknowledge the tuple</span></span><br><span class="line">		collector.ack(input);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepare</span><span class="params">(Map stormConf, TopologyContext context,OutputCollector collector)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.collector = collector;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * The bolt will only emit the field "word" </span><br><span class="line">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">declareOutputFields</span><span class="params">(OutputFieldsDeclarer declarer)</span> </span>&#123;</span><br><span class="line">		declarer.declare(<span class="keyword">new</span> Fields(<span class="string">"word"</span>));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>在此类中，我们看到执行一次<code>execute</code>发送了多个 tuple。如果方法受到的句子如“This is the Storm book”，将发射五个新的tuple。</p>
+</blockquote>
+<p>下一个 bolt 为<code>WordCounter</code>，负责对单词进行计数。当 topology 完成后（当<code>cleanup()</code>被调用时），将打印出每个单词的统计量。</p>
+<blockquote>
+<p><code>WordCounter</code>不发射任何数值。在这个案列中，数据被添加进一个<code>map</code>，但是在现实中 bolt 可将其存储到数据库中。</p>
+</blockquote>
+<figure class="highlight java"><figcaption><span>src/main/java/bolts/WordCounter.java</span><a href="https://github.com/storm-book/examples-ch02-getting_started/blob/master/src/main/java/bolts/WordCounter.java" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> bolts;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> bolts;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.task.OutputCollector;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.task.TopologyContext;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.topology.IRichBolt;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.topology.OutputFieldsDeclarer;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.tuple.Tuple;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">WordCounter</span> <span class="title">implement</span> <span class="title">IRichBolt</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	Integer id;</span><br><span class="line">	String name;</span><br><span class="line">	Map&lt;String, Integer&gt; counters;</span><br><span class="line">    <span class="keyword">private</span> OutputCollector collector;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * At the end of the spout (when the cluster is shutdown</span><br><span class="line">	 * We will show the word counters</span><br><span class="line">	 */</span></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cleanup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		System.out.println(<span class="string">"-- Word Counter ["</span>+name+<span class="string">"-"</span>+id+<span class="string">"] --"</span>);</span><br><span class="line">		<span class="keyword">for</span>(Map.Entry&lt;String, Integer&gt; entry : counters.entrySet())&#123;</span><br><span class="line">			System.out.println(entry.getKey()+<span class="string">": "</span>+entry.getValue());</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * On create </span><br><span class="line">	 */</span></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepare</span><span class="params">(Map stormConf, TopologyContext context, OutputCollector collector)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.counters = <span class="keyword">new</span> HashMap&lt;String, Integer&gt;();</span><br><span class="line">		<span class="keyword">this</span>.name = context.getThisComponentId();</span><br><span class="line">		<span class="keyword">this</span>.id = context.getThisTaskId();</span><br><span class="line">		<span class="keyword">this</span>.collector = collector;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">declareOutputFields</span><span class="params">(OutputFieldsDeclarer declarer)</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(Tuple input)</span> </span>&#123;</span><br><span class="line">		String str = input.getString(<span class="number">0</span>);</span><br><span class="line">		<span class="comment">/**</span><br><span class="line">		 * If the word dosn't exist in the map we will create</span><br><span class="line">		 * this, if not We will add 1 </span><br><span class="line">		 */</span></span><br><span class="line">		<span class="keyword">if</span>(!counters.containsKey(str))&#123;</span><br><span class="line">			counters.put(str, <span class="number">1</span>);</span><br><span class="line">		&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			Integer c = counters.get(str) + <span class="number">1</span>;</span><br><span class="line">			counters.put(str, c);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//Set the tuple as Acknowledge</span></span><br><span class="line">		collector.ack(input);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>execute</code>方法使用一个map来收集和统计单词。当 topology 终止后，<code>cleanup()</code>方法将被调用来打印出map中的统计结果。（这仅是一个示例，通常当 topology 关闭后，会使用<code>cleanup()</code>方法释放一些连接和资源。）</p>
+<h2 id="2-3-3_Main_Class"><strong>2.3.3 Main Class</strong></h2><p>在主类中，我们创建一个 topology 和 一个用于在本地测试盒调试的<code>LocalCluster</code>对象。配合<code>Config</code>对象，你可以使用 <code>LocalCluster</code>尝试不同的集群配置。比如，如果一个全局的或者类变量被意外地使用了，当你使用不同数目的工作节点去测试时将发现错误。（工作细节请参见 <a href="http://javanlu.github.io/blog/2013/10/14/getting-started-with-storm-chapter-3/" target="_blank" rel="external">第三章</a>）</p>
+<blockquote>
+<p>所有的 topology 节点，在处理过程中没有数据共享的前提下，都可以独立地运行。因为在真实的集群环境下，这些处理可能运行在不同的机器上。</p>
+</blockquote>
+<p>可以使用<code>TopologyBuilder</code>来创建 topology，这将告诉 Storm 节点如何安排以及如何交换数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">TopologyBuilder builder = <span class="keyword">new</span> TopologyBuilder();</span><br><span class="line">builder.setSpout(<span class="string">"word-reader"</span>,<span class="keyword">new</span> WordReader());</span><br><span class="line">builder.setBolt(<span class="string">"word-normalizer"</span>, <span class="keyword">new</span> WordNormalizer()).shuffleGrouping(<span class="string">"wordreader"</span>);</span><br><span class="line">builder.setBolt(<span class="string">"word-counter"</span>, <span class="keyword">new</span> WordCounter()).shuffleGrouping(<span class="string">"wordnormalizer"</span>);</span><br></pre></td></tr></table></figure>
+<p>spout 和 bolt 之间使用<code>shuffleGrouping</code>来连接。这种分组方式告诉 Storm 以随机分布的方式从源节点向目标节点发送消息。</p>
+<p>下一步，创建一个<code>Config</code>对象来配置 topology，合并了运行时的集群配置，并将通过<code>prepare</code>方法发送到所有节点。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Config conf = <span class="keyword">new</span> Config();</span><br><span class="line">conf.put(<span class="string">"wordsFile"</span>, args[<span class="number">0</span>]);</span><br><span class="line">conf.setDebug(<span class="keyword">true</span>);</span><br></pre></td></tr></table></figure>
+<p>将<code>wordsFile</code>属性赋值成spout 读取的文件名，在开发过程中将<code>debug</code>属性赋值成 true 。当 <code>debug = true</code>时，Storm将打印出节点间交换的所有信息和其他有用的调试信息，从而可以很容易理解 topology 是如何运行的。</p>
+<p>如早前所述，将使用本地模式来运行 topology。在生产环境下，topology 将会持续运行，但是本例中只将运行数秒钟，这样你能看到结果。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">LocalCluster cluster = <span class="keyword">new</span> LocalCluster();</span><br><span class="line">cluster.submitTopology(<span class="string">"Getting-Started-Toplogie"</span>, conf, builder.createTopology());</span><br><span class="line">Thread.sleep(<span class="number">2000</span>);</span><br><span class="line">cluster.shutdown();</span><br></pre></td></tr></table></figure>
+<p>通过使用<code>createTopology</code>和<code>submitTopology</code>来创建和运行 topology，休眠两秒（topology 运行在不同的线程中），然后停止 topology，并关闭集群。 </p>
+<p>示例2-3是该类所有的代码。</p>
+<figure class="highlight java"><figcaption><span>示例2-3：src/main/java/TopologyMain.java</span><a href="https://github.com/storm-book/examples-ch02-getting_started/blob/master/src/main/java/TopologyMain.java" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> spouts.WordReader;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.Config;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.LocalCluster;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.topology.TopologyBuilder;</span><br><span class="line"><span class="keyword">import</span> backtype.storm.tuple.Fields;</span><br><span class="line"><span class="keyword">import</span> bolts.WordCounter;</span><br><span class="line"><span class="keyword">import</span> bolts.WordNormalizer;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TopologyMain</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">         </span><br><span class="line">        <span class="comment">//Topology definition</span></span><br><span class="line">		TopologyBuilder builder = <span class="keyword">new</span> TopologyBuilder();</span><br><span class="line">		builder.setSpout(<span class="string">"word-reader"</span>,<span class="keyword">new</span> WordReader());</span><br><span class="line">		builder.setBolt(<span class="string">"word-normalizer"</span>, <span class="keyword">new</span> WordNormalizer())</span><br><span class="line">			.shuffleGrouping(<span class="string">"word-reader"</span>);</span><br><span class="line">		builder.setBolt(<span class="string">"word-counter"</span>, <span class="keyword">new</span> WordCounter(),<span class="number">1</span>)</span><br><span class="line">			.fieldsGrouping(<span class="string">"word-normalizer"</span>, <span class="keyword">new</span> Fields(<span class="string">"word"</span>));</span><br><span class="line">		</span><br><span class="line">        <span class="comment">//Configuration</span></span><br><span class="line">		Config conf = <span class="keyword">new</span> Config();</span><br><span class="line">		conf.put(<span class="string">"wordsFile"</span>, args[<span class="number">0</span>]);</span><br><span class="line">		conf.setDebug(<span class="keyword">false</span>);</span><br><span class="line">        <span class="comment">//Topology run</span></span><br><span class="line">		conf.put(Config.TOPOLOGY_MAX_SPOUT_PENDING, <span class="number">1</span>);</span><br><span class="line">		LocalCluster cluster = <span class="keyword">new</span> LocalCluster();</span><br><span class="line">		cluster.submitTopology(<span class="string">"Getting-Started-Toplogie"</span>, conf, builder.createTopology());</span><br><span class="line">		Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">		cluster.shutdown();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-3-4_查看结果"><strong>2.3.4 查看结果</strong></h2><p>准备好运行第一个topology了吗？如果你创建一个 <code>src/main/resources/words.txt</code>文件，每行一个单词，那么你可以这样运行topology：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mvn <span class="built_in">exec</span>:java -Dexec.mainClass=<span class="string">"TopologyMain"</span> -Dexec.args=<span class="string">"src/main/resources/</span><br><span class="line">words.txt"</span></span><br></pre></td></tr></table></figure>
+<p>比如，你的文件中内容如下：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">test</span><br><span class="line">are</span><br><span class="line">great</span><br><span class="line"><span class="keyword">is</span></span><br><span class="line">an</span><br><span class="line">Storm</span><br><span class="line">simple</span><br><span class="line"><span class="type">application</span></span><br><span class="line"><span class="keyword">but</span></span><br><span class="line">very</span><br><span class="line">powerful</span><br><span class="line">really</span><br><span class="line">Storm</span><br><span class="line"><span class="keyword">is</span></span><br><span class="line">great</span><br></pre></td></tr></table></figure>
+<p>在日志中，你能看到如下结果:</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">is</span>: <span class="string">2</span></span><br><span class="line"><span class="attribute">application</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">but</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">great</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">test</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">simple</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">Storm</span>: <span class="string">3</span></span><br><span class="line"><span class="attribute">really</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">are</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">great</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">an</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">powerful</span>: <span class="string">1</span></span><br><span class="line"><span class="attribute">very</span>: <span class="string">1</span></span><br></pre></td></tr></table></figure>
+<p>在本例中，每个节点仅有一个实例。但是如果你有一个很大的日志文件，怎么办？你可以简单地通过改变系统中的节点数目来并行化处理工作。比如，你创建两个 <code>WordCounter</code>实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">builder.setBolt(<span class="string">"word-counter"</span>, <span class="keyword">new</span> WordCounter(),<span class="number">2</span>)</span><br><span class="line">.shuffleGrouping(<span class="string">"word-normalizer"</span>);</span><br></pre></td></tr></table></figure>
+<p>程序结束后，你将看到：</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-- Word Counter [word-counter-<span class="number">2</span>] --</span><br><span class="line"><span class="label">application:</span> <span class="number">1</span></span><br><span class="line"><span class="label">is:</span> <span class="number">1</span></span><br><span class="line"><span class="label">great:</span> <span class="number">1</span></span><br><span class="line"><span class="label">are:</span> <span class="number">1</span></span><br><span class="line"><span class="label">powerful:</span> <span class="number">1</span></span><br><span class="line"><span class="label">Storm:</span> <span class="number">3</span></span><br><span class="line">-- Word Counter [word-counter-<span class="number">3</span>] --</span><br><span class="line"><span class="label">really:</span> <span class="number">1</span></span><br><span class="line"><span class="label">is:</span> <span class="number">1</span></span><br><span class="line"><span class="label">but:</span> <span class="number">1</span></span><br><span class="line"><span class="label">great:</span> <span class="number">1</span></span><br><span class="line"><span class="label">test:</span> <span class="number">1</span></span><br><span class="line"><span class="label">simple:</span> <span class="number">1</span></span><br><span class="line"><span class="label">an:</span> <span class="number">1</span></span><br><span class="line"><span class="label">very:</span> <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>太棒了！改变并行程度是如此简单（现实中，每个实例当然运行在一个独立的机器上）。但是从结果可看出一个问题：<code>is</code>和<code>greate</code>在每个<code>WordCounter</code>实例中各被统计一次。为什么？当使用<code>shuffleGrouping</code>时，Storm 以随机分布的方式将每个信息发送到一个实例。但是本例中，希望同一个单词背发送同一个<code>WordCounter</code>节点。为了达到这种效果，你可以将<code>shuffleGrouping(&quot;wordnormalizer&quot;)</code><br>改变成<code>fieldsGrouping(&quot;word-normalizer&quot;,new Fields(&quot;word&quot;))</code>。尝试一下，并确认结果。你将在下一章看到更多分组和消息流。</p>
+<h1 id="2-4_总结">2.4 总结</h1><p>我们讨论了Storm 本地模式和远程模式的不同点，以及Storm编程的强大和简易。你也学习到了Storm的更多基础概念，我们将在接下来的章节对其进行深入阐述。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Storm/" rel="tag">#Storm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/10/15/getting-started-with-storm-chapter-3/" rel="prev">[译]【Storm入门指南】第三章 Topologies</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/10/14/getting-started-with-storm-chapter-1/" rel="next">[译]【Storm 入门指南】第一章 基础</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2013/10/15/getting-started-with-storm-chapter-2/"
+                   data-title="[译]【Storm入门指南】第二章 入门实例" data-url="http://yoursite.com/2013/10/15/getting-started-with-storm-chapter-2/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="http://www.gravatar.com/avatar/f1d8cf8dbe2d0ce8d8255810a3138fa2?s=160" alt="JavanLu" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">JavanLu</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Still Waters Run Deep.</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#2-1_运行模式"><span class="nav-number">1.</span> <span class="nav-text">2.1 运行模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-1_本地模式"><span class="nav-number">1.1.</span> <span class="nav-text">2.1.1 本地模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-2_远程模式"><span class="nav-number">1.2.</span> <span class="nav-text">2.1.2 远程模式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-2_Storm，你好！"><span class="nav-number">2.</span> <span class="nav-text">2.2 Storm，你好！</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-1_检查Java安装"><span class="nav-number">2.1.</span> <span class="nav-text">2.2.1 检查Java安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-2_创建工程"><span class="nav-number">2.2.</span> <span class="nav-text">2.2.2 创建工程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-3_创建第一个_Topology"><span class="nav-number">3.</span> <span class="nav-text">2.3 创建第一个 Topology</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-1_Spout"><span class="nav-number">3.1.</span> <span class="nav-text">2.3.1 Spout</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-2_Bolts"><span class="nav-number">3.2.</span> <span class="nav-text">2.3.2 Bolts</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-3_Main_Class"><span class="nav-number">3.3.</span> <span class="nav-text">2.3.3 Main Class</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-4_查看结果"><span class="nav-number">3.4.</span> <span class="nav-text">2.3.4 查看结果</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-4_总结"><span class="nav-number">4.</span> <span class="nav-text">2.4 总结</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2013 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JavanLu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"javansblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

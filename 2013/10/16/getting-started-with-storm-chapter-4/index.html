@@ -1,0 +1,756 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="Still Waters Run Deep." />
+
+
+
+  <meta name="keywords" content="Storm," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="特别注明：本文翻译自 Getting started with Storm 第四章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+本章，你将学习到最被经常用来设计 topology（spout）的策略以及 spout 是如何具有容错能力的。
+4.1 可靠 vs. 不可靠消息当设计 topology 时，消息的可靠性是浮现在脑海中最重要的一件事。如果">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[译]【Storm入门指南】第四章 Spouts">
+<meta property="og:url" content="http://yoursite.com/2013/10/16/getting-started-with-storm-chapter-4/index.html">
+<meta property="og:site_name" content="Javan's Blog">
+<meta property="og:description" content="特别注明：本文翻译自 Getting started with Storm 第四章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+本章，你将学习到最被经常用来设计 topology（spout）的策略以及 spout 是如何具有容错能力的。
+4.1 可靠 vs. 不可靠消息当设计 topology 时，消息的可靠性是浮现在脑海中最重要的一件事。如果">
+<meta property="og:image" content="http://yoursite.com/images/post/storm/chapter4/fig4_1.png">
+<meta property="og:image" content="http://yoursite.com/images/post/storm/chapter4/fig4_2.png">
+<meta property="og:image" content="http://yoursite.com/images/post/storm/chapter4/fig4_3.png">
+<meta property="og:image" content="http://yoursite.com/images/post/storm/chapter4/fig4_4.png">
+<meta property="og:updated_time" content="2015-08-08T05:41:54.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="[译]【Storm入门指南】第四章 Spouts">
+<meta name="twitter:description" content="特别注明：本文翻译自 Getting started with Storm 第四章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。
+
+本章，你将学习到最被经常用来设计 topology（spout）的策略以及 spout 是如何具有容错能力的。
+4.1 可靠 vs. 不可靠消息当设计 topology 时，消息的可靠性是浮现在脑海中最重要的一件事。如果">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> [译]【Storm入门指南】第四章 Spouts | Javan's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Javan's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'hV94zB5BAjdxzas-hytK','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              [译]【Storm入门指南】第四章 Spouts
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2013-10-16T20:59:00+08:00" content="2013-10-16">
+            2013-10-16
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/技术/" itemprop="url" rel="index">
+                  <span itemprop="name">技术</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2013/10/16/getting-started-with-storm-chapter-4/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2013/10/16/getting-started-with-storm-chapter-4/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><blockquote>
+<p>特别注明：本文翻译自 <a href="http://shop.oreilly.com/product/0636920024835.do" target="_blank" rel="external">Getting started with Storm</a> 第四章，以作学习交流之用，非盈利性质。如需转载，请以超链接形式标明文章原始出处和作者信息及版权声明。</p>
+</blockquote>
+<p>本章，你将学习到最被经常用来设计 topology（spout）的策略以及 spout 是如何具有容错能力的。</p>
+<h1 id="4-1_可靠_vs-_不可靠消息">4.1 可靠 vs. 不可靠消息</h1><p>当设计 topology 时，消息的可靠性是浮现在脑海中最重要的一件事。如果一个消息不能被处理，你需要决定如何处理这条消息以及整个topology需要做什么。比如，当处理银行存款业务时，很重要的一点事不能丢失任何一条交易消息。但是如果你处理上百万条tweet信息时来寻找某些统计指标时，一条丢失的消息对指标的准确性没有影响。</p>
+<a id="more"></a>
+<p>在 Storm 中，保证对每个 topology 的消息的可靠性是作者的责任。这包含一个 trade-off。一个可靠的 topology 必须可能需要更多资源来管理丢失的消息。一个低可靠的 topology  可能会丢失一些消息，但是需要更少的资源。无论选择哪种可靠性策略，Storm 都提供了工具区实现它。</p>
+<p>在 spout 中管理可靠性，可以在发射的时候（<code>collector.emit(new Values(...), tupleId)</code>）的时候往 tuple 中添加一个消息 ID。当一个 tuple 被处理正确或失败，<code>ack</code>或<code>fail</code>方法会被调用。只有在 tuple 被所有目标 bolt 和所有锚定 bolt（<a href="http://javanlu.github.io/blog/2013/10/14/getting-started-with-storm-chapter-5" target="_blank" rel="external">第五章</a>将介绍如何将一个 bolt 锚定到一个 tuple）处理完，tuple 处理才算成功。</p>
+<p>处理 tuple 失败的情形有：</p>
+<ul>
+<li><p>目标 spout 调用<code>collector.fail(tuple)</code></p>
+</li>
+<li><p>处理时间超过配置的超时时间</p>
+</li>
+</ul>
+<p>来看一个例子。想象一下你正在处理银行交易，你有如下需求：</p>
+<ul>
+<li><p>如果一个交易失败，重发消息</p>
+</li>
+<li><p>如果交易多次失败，终止 topology</p>
+</li>
+</ul>
+<p>创建一个 spout，发送100个随机的交易 ID，一个接收 tuple 但是会 80% 失败的 bolt(你可以从 <a href="https://github.com/storm-book/examples-ch04-spouts/" target="_blank" rel="external">ch04-spout example</a>中找到所有源码)。实现这个 spout，使用一个 <code>Map</code>来发射交易消息 tuple，这样就很容易重发消息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">nextTuple</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(!toSend.isEmpty())&#123;</span><br><span class="line">		<span class="keyword">for</span>(Map.Entry&lt;Integer, String&gt; transactionEntry : toSend.entrySet())&#123;</span><br><span class="line">			Integer transactionId = transactionEntry.getKey();</span><br><span class="line">			String transactionMessage = transactionEntry.getValue();</span><br><span class="line">			collector.emit(<span class="keyword">new</span> Values(transactionMessage),transactionId);</span><br><span class="line">		&#125;</span><br><span class="line">	toSend.clear();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果有需要被发送的消息，取得相关的交易信息并附加上标识 ID，以 tuple 形式发射出去，接着清空消息队列。需要说明的是，这儿调用<code>clear</code>方法清空 map 是安全的，因为<code>nextTuple</code>、<code>fail</code>和<code>ack</code>是修改 map 的唯一方法，它们都在同一个线程中。</p>
+<p>维护两个 map：一个用来追踪等待被发送的交易信息，一个用来记录每个交易失败的次数。<code>ack</code>方法只是简单地从 list 中删除交易信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ack</span><span class="params">(Object msgId)</span> </span>&#123;</span><br><span class="line">	messages.remove(msgId);</span><br><span class="line">	failCounterMessages.remove(msgId);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>fail</code>方法决定是否需要重发交易信息或者当失败很多次后直接失败。</p>
+<blockquote>
+<p>如果在 topology 中使用广播分组方式，一旦任意 bolt 失败，spout 的<code>fail</code>方法都将被调用。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">fail</span><span class="params">(Object msgId)</span> </span>&#123;</span><br><span class="line">	Integer transactionId = (Integer) msgId;</span><br><span class="line">	<span class="comment">// Check the number of times the transaction has failed</span></span><br><span class="line">	Integer failures = transactionFailureCount.get(transactionId) + <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">if</span>(fails &gt;= MAX_FAILS)&#123;</span><br><span class="line">		<span class="comment">// If the number of failures is too high, terminate the topology</span></span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"Error, transaction id ["</span>+</span><br><span class="line">		transactionId+<span class="string">"] has had too many errors ["</span>+failures+<span class="string">"]"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// If the number of failures is less than the maximum, save the number and re-send the message</span></span><br><span class="line">	transactionFailureCount.put(transactionId, failures);</span><br><span class="line">	toSend.put(transactionId,messages.get(transactionId));</span><br><span class="line">	LOG.info(<span class="string">"Re-sending message ["</span>+msgId+<span class="string">"]"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先，检查交易失败的次数。如果该交易失败了很多次，跑出一个<code>RuntimeException</code>来终止运行它的工作者。否则，保存失败次数然后将交易消息放到<code>toSend</code>队列中，这样当<code>nextTuple</code>执行时它会被再次发送。</p>
+<blockquote>
+<p>Storm 节点不维护状态。如果将信息保存在内存中，一旦节点失效，你将失去所有保存的信息。</p>
+</blockquote>
+<p>Storm 是一个快速失败系统。如果一个异常被抛出，topology 将失败，但是 Storm 会在一致状态下重启处理，从而可以恢复正常。</p>
+<h1 id="4-2_获取数据">4.2 获取数据</h1><p>你将在本节接触一些用来设计从多个数据源高效地收集数据的常用技术。 </p>
+<h2 id="4-2-1_直接连接"><strong>4.2.1 直接连接</strong></h2><p>在直接获取体系下，spout 直接连接上消息发射器。[如图4.1所示]</p>
+<p><img src="/images/post/storm/chapter4/fig4_1.png" alt="图4.1"></p>
+<p>这种体系非常容易实现，适用于消息发射器是众所周知的设备或者设备组。众所周知的设备，指的是输出在启动时已知且在整个 topology 生命周期保持不变。未知设备是指在 topology 运行之后被加入的。众所周知的设备组，是一个组中所有设备在启动时就已知的设备组。</p>
+<p>作为例子，创建一个使用 <a href="https://dev.twitter.com/docs/streaming-apis" target="_blank" rel="external">Twitter streaming API</a>来读取Twitter数据流的 spout。这个 spout 将直接连接到作为消息发射器的该API上。以<code>track</code>参数来过滤所有匹配的公共 tweet 消息流。示例的所有代码可从 <a href="https://github.com/storm-book/examples-ch04-spouts/" target="_blank" rel="external">Github</a> 上找到。</p>
+<p>spout 从配置对象 <code>object(track, user, password)</code> 中获取连接参数，然后创建到API的连接（在本例中，使用<a href="http://apache.org" target="_blank" rel="external">Apache</a>的<a href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/org/apache/http/impl/client/DefaultHttpClient.html" target="_blank" rel="external">DefaultHttpClient</a> ）。spout 每次读取一行信息，将其从 JSON 格式转换成 Java 对象，然后发射出去。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">nextTuple</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="comment">/*</span><br><span class="line">     * Create the client call</span><br><span class="line">     */</span></span><br><span class="line">	</span><br><span class="line">	client = <span class="keyword">new</span> DefaultHttpClient();</span><br><span class="line">    client.setCredentialsProvider(credentialProvider);</span><br><span class="line">    HttpGet get = <span class="keyword">new</span> HttpGet(STREAMING_API_URL+track);                </span><br><span class="line">    HttpResponse response;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">    	<span class="comment">//Execute</span></span><br><span class="line">        response = client.execute(get);</span><br><span class="line">        StatusLine status = response.getStatusLine();</span><br><span class="line">        <span class="keyword">if</span>(status.getStatusCode() == <span class="number">200</span>)&#123;</span><br><span class="line">        InputStream inputStream = response.getEntity().getContent();</span><br><span class="line">        BufferedReader reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(inputStream));</span><br><span class="line">        String in;</span><br><span class="line">        <span class="comment">//Read line by line</span></span><br><span class="line">        <span class="keyword">while</span>((in = reader.readLine())!=<span class="keyword">null</span>)&#123;</span><br><span class="line">        	<span class="keyword">try</span>&#123;</span><br><span class="line">            	<span class="comment">//Parse and emit</span></span><br><span class="line">                Object json = jsonParser.parse(in);</span><br><span class="line">                collector.emit(<span class="keyword">new</span> Values(track,json));</span><br><span class="line">            &#125;<span class="keyword">catch</span> (ParseException e) &#123;</span><br><span class="line">                LOG.error(<span class="string">"Error parsing message from twitter"</span>,e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">    	LOG.error(<span class="string">"Error in communication with twitter api ["</span>+get.getURI().toString()+<span class="string">"]"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">        	Thread.sleep(<span class="number">10000</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e1) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这里正在锁定<code>nextTuple</code>方法，<code>ack</code>和<code>fail</code>方法永远不会被执行。实际应用中，建议在一个单独的线程中加锁，并且使用内部队列来交换信息（你将从下一章学习到如何这样做）。</p>
+</blockquote>
+<p>这很好！</p>
+<p>你正使用一个 spout 从 Twitter 数据流中读取数据。如果并行化这个 topology，你将可拥有几个 spout 来读取数据流的不同部分，这样做没有意义。那么如果你有多条需要读取的数据流，如何进行并行化处理呢？Storm 一个有趣的特性是，你可以从任意组件（spout/bolt）中读取<code>TopologyContext</code>。 你可以利用这个特性在多个 spout 实例间分配 数据流。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">open</span><span class="params">(Map conf, TopologyContext context,</span><br><span class="line">                        SpoutOutputCollector collector)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">int</span> spoutsSize = context.getComponentTasks(context.getThisComponentId()).size();</span><br><span class="line">                <span class="keyword">int</span> myIdx = context.getThisTaskIndex();</span><br><span class="line">                String[] tracks = ((String) conf.get(<span class="string">"track"</span>)).split(<span class="string">","</span>);</span><br><span class="line">                StringBuffer tracksBuffer = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">                <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt; tracks.length;i++)&#123;</span><br><span class="line">                        <span class="keyword">if</span>( i % spoutsSize == myIdx)&#123;</span><br><span class="line">                                tracksBuffer.append(<span class="string">","</span>);</span><br><span class="line">                                tracksBuffer.append(tracks[i]);</span><br><span class="line">                        &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">                <span class="keyword">if</span>(tracksBuffer.length() == <span class="number">0</span>)</span><br><span class="line">                        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"No track found for spout"</span> +</span><br><span class="line">                                        <span class="string">" [spoutsSize:"</span>+spoutsSize+<span class="string">", tracks:"</span>+tracks.length+<span class="string">"] the amount"</span> +</span><br><span class="line">                                        <span class="string">" of tracks must be more then the spout paralellism"</span>);</span><br><span class="line">                </span><br><span class="line">                <span class="keyword">this</span>.track =tracksBuffer.substring(<span class="number">1</span>).toString();</span><br><span class="line">                ...</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>利用该技术，可以在数据源头分发 collector。同样的技术可以被用到其他情形下，比如从web服务器中读取日志文件。[如图4.2所示]</p>
+<p><img src="/images/post/storm/chapter4/fig4_2.png" alt="图4.2"></p>
+<p>在前面的例子中，使用直接获取方式连接到已知的设备上。你可以使用同样的技术连接到未知设备上，只需要一个协调系统来维护设备列表。协调系统侦测列表变化、创建和销毁连接。比如，当从web服务器中收集日志文件的时候，web服务器列表可能会经常变化。当一个服务器被添加时，协调系统侦测到变化并为它创建新的spout，如图4.3所示。</p>
+<p><img src="/images/post/storm/chapter4/fig4_3.png" alt="图4.3"></p>
+<blockquote>
+<p>相比较其他方式，推荐创建从spout到消息发射源的连接。如果一台运行了 spout 的机器宕机了，Storm 将在另一台机器上重启这个 spout。相比较消息发射源需要追踪spout 运行在那台机器上，spout 定位消息发射源是更容易的做法。</p>
+</blockquote>
+<h2 id="4-2-2_队列消息"><strong>4.2.2 队列消息</strong></h2><p>第二种途径是将 spout 连接到一个排队系统，该系统从消息发射源接受消息，并能够让 spout 消费消息。使用排队系统的优势是，它可以作为数据源和 spout 之间的中间件。许多情况下，你可以使用排队系统的消息重放机制来实现可靠的队列。这意味着，你不需要关注消息发射器的任何信息；相比直接连接方式，能够更方便地处理发射器的添加和删除。但是该结构的问题在于，队列将成为失败点，你需要为处理流添加新的一层结构。</p>
+<p>下图显示了该架构的概貌。</p>
+<p><img src="/images/post/storm/chapter4/fig4_4.png" alt="图4.4"></p>
+<blockquote>
+<p>你可以使用循环拉或者哈希队列（将队列消息按照哈希值划分，然后发送到 spout 或者创建新的队列）来并行化队列的处理，在多个 spout 间划分消息。</p>
+</blockquote>
+<p>创建一个示例，使用 <a href="http://redis.io/" target="_blank" rel="external">Redis</a> 作为队列系统，相对应的 Java 库是 <a href="https://github.com/xetorthio/jedis" target="_blank" rel="external">Jedis</a>。 在这个示例中，创建一个日志处理器从一个未知的数据源收集日志：使用<code>lpush</code>将消息压入队列，使用<code>blpop</code>来等待消息。如果有多个处理，使用<code>blpop</code>可以循环接收消息。</p>
+<p>为了从Redis中检索消息，在 spout 的<code>open</code>方法中创建一个线程（使用线程可以避免锁住<code>nextTuple</code>方法所在的主循环）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> Thread(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">while</span>(<span class="keyword">true</span>)&#123;</span><br><span class="line">			<span class="keyword">try</span>&#123;</span><br><span class="line">				Jedis client = <span class="keyword">new</span> Jedis(redisHost, redisPort);</span><br><span class="line">				List&lt;String&gt; res = client.blpop(Integer.MAX_VALUE, queues);</span><br><span class="line">				messages.offer(res.get(<span class="number">1</span>));</span><br><span class="line">				&#125;<span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line">					LOG.error(<span class="string">"Error reading queues from redis"</span>,e);</span><br><span class="line">					<span class="keyword">try</span> &#123;</span><br><span class="line">						Thread.sleep(<span class="number">100</span>);</span><br><span class="line">					&#125; <span class="keyword">catch</span> (InterruptedException e1) &#123;&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;).start()</span><br></pre></td></tr></table></figure>
+<p>该线程唯一的目的是创建连接并执行<code>blpop</code>指令。当一个消息被接收后，它被添加到一个内部的、可被<code>nextTuple</code>方法消费的消息队列。这儿，你可以看出，Redis 队列是一个源，你不知道哪个是消息的发射者或是他们的数量。</p>
+<blockquote>
+<p>简易不要为 spout 创建许多线程，因为每个 spout 运行在不同的线程中。与其创建很多线程，不如增加并行度。这将以分布式方式在 Storm 集群中创建更多的线程。</p>
+</blockquote>
+<p>在<code>nextTuple</code>方法中，唯一需要做的事情就是接受消息并且发射它们。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">nextTuple</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">while</span>(!messages.isEmpty())&#123;</span><br><span class="line">		collector.emit(<span class="keyword">new</span> Values(messages.poll()));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>你可以修改 spout 使其利用 Redis 的消息重放功能来使得 topology 变得可靠。</p>
+</blockquote>
+<h2 id="4-2-3_DRPC"><strong>4.2.3 DRPC</strong></h2><p>DRPCSpout 是一个实现了从 DRPC 服务器接收函数调用并处理它的 spout（参见<a href="http://javanlu.github.io/blog/2013/10/14/getting-started-with-storm-chapter-3" target="_blank" rel="external">第三章</a>的示例）。在大多数情况下，<code>backtype.storm.drpc.DRPCSpout</code>足够使用了，但是你也可以使用Storm包中的 DRPC 类来创建自己的实现类。</p>
+<h1 id="4-3_总结">4.3 总结</h1><p>你已经看到了常用的 spout 实现模式、优点以及如何让消息变得可靠。基于你要解决的问题来构建 spout 通信是很重要的。没有一个适合所有 topology 的架构。如果你知道源或者能够控制它们，你可以使用直接连接方式；如果你需要添加未知源或者从多种源接收消息的能力，队列连接会是更好的选择。如果你需要在线处理，你需要使用<code>DBPCSpouts</code>或类似的实现。</p>
+<p>尽管你已经知道三种主要的连接方式，仍然有无数种方式去实现它，这取决于你的需求。</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Storm/" rel="tag">#Storm</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/10/16/getting-started-with-storm-chapter-5/" rel="prev">[译]【Storm入门指南】第五章 Bolts</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/10/15/getting-started-with-storm-chapter-3/" rel="next">[译]【Storm入门指南】第三章 Topologies</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2013/10/16/getting-started-with-storm-chapter-4/"
+                   data-title="[译]【Storm入门指南】第四章 Spouts" data-url="http://yoursite.com/2013/10/16/getting-started-with-storm-chapter-4/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="http://www.gravatar.com/avatar/f1d8cf8dbe2d0ce8d8255810a3138fa2?s=160" alt="JavanLu" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">JavanLu</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Still Waters Run Deep.</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#4-1_可靠_vs-_不可靠消息"><span class="nav-number">1.</span> <span class="nav-text">4.1 可靠 vs. 不可靠消息</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-2_获取数据"><span class="nav-number">2.</span> <span class="nav-text">4.2 获取数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-1_直接连接"><span class="nav-number">2.1.</span> <span class="nav-text">4.2.1 直接连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-2_队列消息"><span class="nav-number">2.2.</span> <span class="nav-text">4.2.2 队列消息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-3_DRPC"><span class="nav-number">2.3.</span> <span class="nav-text">4.2.3 DRPC</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-3_总结"><span class="nav-number">3.</span> <span class="nav-text">4.3 总结</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2013 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JavanLu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"javansblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>

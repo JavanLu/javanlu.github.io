@@ -1,0 +1,698 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="Still Waters Run Deep." />
+
+
+
+  <meta name="keywords" content="CSRF,Spring,安全," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="关于CSRF是什么东西，请参见我的博文：《浅析CSRF》。本文将给出一种在 SpringMVC3+Velocity 的框架下防御CSRF攻击的解决方案。主要思想参考 EYAL LUPU[1] 的解决方案，但使用Velocity宏来进行Token值的传递，而不是使用spring form标签。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一种在SpirngMVC3中防御CSRF攻击的实现">
+<meta property="og:url" content="http://yoursite.com/2013/09/29/springmvc-csrf-defense/index.html">
+<meta property="og:site_name" content="Javan's Blog">
+<meta property="og:description" content="关于CSRF是什么东西，请参见我的博文：《浅析CSRF》。本文将给出一种在 SpringMVC3+Velocity 的框架下防御CSRF攻击的解决方案。主要思想参考 EYAL LUPU[1] 的解决方案，但使用Velocity宏来进行Token值的传递，而不是使用spring form标签。">
+<meta property="og:updated_time" content="2015-08-19T14:34:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一种在SpirngMVC3中防御CSRF攻击的实现">
+<meta name="twitter:description" content="关于CSRF是什么东西，请参见我的博文：《浅析CSRF》。本文将给出一种在 SpringMVC3+Velocity 的框架下防御CSRF攻击的解决方案。主要思想参考 EYAL LUPU[1] 的解决方案，但使用Velocity宏来进行Token值的传递，而不是使用spring form标签。">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> 一种在SpirngMVC3中防御CSRF攻击的实现 | Javan's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Javan's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'hV94zB5BAjdxzas-hytK','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              一种在SpirngMVC3中防御CSRF攻击的实现
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2013-09-29T09:36:00+08:00" content="2013-09-29">
+            2013-09-29
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/技术/" itemprop="url" rel="index">
+                  <span itemprop="name">技术</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2013/09/29/springmvc-csrf-defense/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2013/09/29/springmvc-csrf-defense/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>关于CSRF是什么东西，请参见我的博文：<a href="http://javanlu.github.io/blog/2013/09/27/csrf-brief-analysis/" target="_blank" rel="external">《浅析CSRF》</a>。本文将给出一种在 SpringMVC3+Velocity 的框架下防御CSRF攻击的解决方案。主要思想参考 <a href="http://blog.eyallupu.com/2012/04/csrf-defense-in-spring-mvc-31.html" target="_blank" rel="external">EYAL LUPU</a><sup>[1]</sup> 的解决方案，但使用Velocity宏来进行Token值的传递，而不是使用<code>spring form</code>标签。</p>
+<a id="more"></a>
+<h2 id="一、方案概要"><strong>一、方案概要</strong></h2><p>在服务器端生成私有的会话级token，使用Velocity的宏命令在客户端的Form表单中插入这个token；在表单提交后对，服务器端对token值进行校验，根据结果来区分该次请求是否合法：正确就放行，不正确就就阻断请求。</p>
+<p>在这里，我们约定：<strong>凡是更新资源的操作，都通过POST向服务器端发送</strong>。这也是符合HTTP规范的约定。</p>
+<h2 id="二、Token生成"><strong>二、Token生成</strong></h2><p>使用一个 CSRFTokenManager 类来进行token生成的工作，代码如下：</p>
+<figure class="highlight java"><figcaption><span>CSRFTokenManager.java</span><a href="https://github.com/JavanLu/javan-blog/blob/master/springmvc-csrf-velocity/src/main/java/com/javan/security/CSRFTokenManager.java" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.javan.security;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.UUID;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpSession;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * A manager for the CSRF token for a given session. The &#123;<span class="doctag">@link</span> #getTokenForSession(HttpSession)&#125; should used to obtain</span><br><span class="line"> * the token value for the current session (and this should be the only way to obtain the token value).</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">CSRFTokenManager</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * The token parameter name</span><br><span class="line">	 */</span></span><br><span class="line">	<span class="keyword">static</span> <span class="keyword">final</span> String CSRF_PARAM_NAME = <span class="string">"xToken"</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * The location on the session which stores the token</span><br><span class="line">	 */</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">static</span> String CSRF_TOKEN_FOR_SESSION_ATTR_NAME = CSRFTokenManager.class.getName() + <span class="string">".tokenval"</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getTokenForSession</span><span class="params">(HttpSession session)</span> </span>&#123;</span><br><span class="line">		String token = <span class="keyword">null</span>;</span><br><span class="line">		<span class="comment">// cannot allow more than one token on a session - in the case of two requests trying to</span></span><br><span class="line">		<span class="comment">// init the token concurrently</span></span><br><span class="line">		<span class="keyword">synchronized</span> (session) &#123;</span><br><span class="line">			token = (String) session.getAttribute(CSRF_TOKEN_FOR_SESSION_ATTR_NAME);</span><br><span class="line">			<span class="keyword">if</span> (<span class="keyword">null</span> == token) &#123;</span><br><span class="line">				token = UUID.randomUUID().toString();</span><br><span class="line">				session.setAttribute(CSRF_TOKEN_FOR_SESSION_ATTR_NAME, token);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> token;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span><br><span class="line">	 * Extracts the token value from the session</span><br><span class="line">	 * </span><br><span class="line">	 * <span class="doctag">@param</span> request</span><br><span class="line">	 * <span class="doctag">@return</span></span><br><span class="line">	 */</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">getTokenFromRequest</span><span class="params">(HttpServletRequest request)</span> </span>&#123;</span><br><span class="line">		String token = request.getParameter(CSRF_PARAM_NAME);</span><br><span class="line">		<span class="keyword">if</span> (token == <span class="keyword">null</span> || <span class="string">""</span>.equals(token)) &#123;</span><br><span class="line">			token = request.getHeader(CSRF_PARAM_NAME);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> token;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="title">CSRFTokenManager</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>getTokenForSession</code>方法用于检查<code>HTTP session</code>中是否存在CSRF token：存在则返回；不存在则生成并存储到session中，然后返回。</p>
+<h2 id="三、Token依附到Form"><strong>三、Token依附到Form</strong></h2><p>由于我的前端使用 Velocity 进行渲染，并且不使用 <code>Spring form</code>标签，所以为了将token依附到Form表单中，我使用 Velocity 的宏指令进行渲染工作。</p>
+<p>SpringMVC 中的配置，主要是配置 <code>Velocity Tools</code>：</p>
+<figure class="highlight xml"><figcaption><span>mvc-context.xml</span><a href="https://github.com/JavanLu/javan-blog/blob/master/springmvc-csrf-velocity/src/main/webapp/WEB-INF/mvc-context.xml" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"velocityConfig"</span></span><br><span class="line">	<span class="attribute">class</span>=<span class="value">"org.springframework.web.servlet.view.velocity.VelocityConfigurer"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"resourceLoaderPath"</span> <span class="attribute">value</span>=<span class="value">"/WEB-INF/views/"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"velocityProperties"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">props</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"input.encoding"</span>&gt;</span>utf-8<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="title">prop</span> <span class="attribute">key</span>=<span class="value">"output.encoding"</span>&gt;</span>utf-8<span class="tag">&lt;/<span class="title">prop</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="title">props</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- Velocity的配置文件 --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"configLocation"</span> <span class="attribute">value</span>=<span class="value">"/WEB-INF/velocity.properties"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">bean</span> <span class="attribute">id</span>=<span class="value">"viewResolver"</span></span><br><span class="line">	<span class="attribute">class</span>=<span class="value">"org.springframework.web.servlet.view.velocity.VelocityViewResolver"</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"cache"</span> <span class="attribute">value</span>=<span class="value">"true"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"contentType"</span> <span class="attribute">value</span>=<span class="value">"text/html;charset=utf-8"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"exposeSpringMacroHelpers"</span> <span class="attribute">value</span>=<span class="value">"true"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"suffix"</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="title">value</span>&gt;</span>.vm<span class="tag">&lt;/<span class="title">value</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="title">property</span>&gt;</span></span><br><span class="line">		<span class="comment">&lt;!-- Velocity tools的配置文件 --&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"toolboxConfigLocation"</span> <span class="attribute">value</span>=<span class="value">"WEB-INF/toolbox.xml"</span> /&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="title">property</span> <span class="attribute">name</span>=<span class="value">"exposeSessionAttributes"</span> <span class="attribute">value</span>=<span class="value">"true"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">bean</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><code>Toolbox.xml</code>中定义生成 CSRF token 的 tool:</p>
+<figure class="highlight xml"><figcaption><span>toolbox.xml</span><a href="https://github.com/JavanLu/javan-blog/blob/master/springmvc-csrf-velocity/src/main/webapp/WEB-INF/toolbox.xml" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">toolbox</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">tool</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="title">key</span>&gt;</span>csrfTool<span class="tag">&lt;/<span class="title">key</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="title">scope</span>&gt;</span>application<span class="tag">&lt;/<span class="title">scope</span>&gt;</span></span><br><span class="line">	    <span class="tag">&lt;<span class="title">class</span>&gt;</span>com.javan.util.CSRFTool<span class="tag">&lt;/<span class="title">class</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="title">tool</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">toolbox</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>工具类CSRFTool.java：</p>
+<figure class="highlight xml"><figcaption><span>CSRFTool.xml</span><a href="https://github.com/JavanLu/javan-blog/blob/master/springmvc-csrf-velocity/src/main/java/com/javan/util/CSRFTool.java" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">package com.javan.util;</span><br><span class="line"></span><br><span class="line">import javax.servlet.http.HttpServletRequest;</span><br><span class="line"></span><br><span class="line">import com.javan.security.CSRFTokenManager;</span><br><span class="line"></span><br><span class="line">public class CSRFTool &#123;</span><br><span class="line">	public static String getToken(HttpServletRequest request) &#123;</span><br><span class="line">		return CSRFTokenManager.getTokenForSession(request.getSession());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>页面渲染CSRF token的宏命令：</p>
+<figure class="highlight js"><figcaption><span>macros-default.vm</span><a href="https://github.com/JavanLu/javan-blog/blob/master/springmvc-csrf-velocity/src/main/resources/macros-default.vm" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">#** CSRFToken</span><br><span class="line"> * Generate a input field <span class="keyword">of</span> type <span class="string">'hidden'</span> <span class="keyword">of</span> token to avoid CSRF attack </span><br><span class="line">*#</span><br><span class="line">#macro( CSRFToken $id)</span><br><span class="line">	#<span class="keyword">if</span>(!$id || $id == <span class="string">""</span>)</span><br><span class="line">		#set($id=<span class="string">"xToken"</span>)</span><br><span class="line">	#end</span><br><span class="line">	&lt;input type=<span class="string">"hidden"</span> id=<span class="string">"$id"</span> name=<span class="string">"xToken"</span> value=<span class="string">"$csrfTool.getToken($request)"</span>/&gt;</span><br><span class="line">#end</span><br></pre></td></tr></table></figure>
+<p>在前端的Form表单中添加token值：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">form</span> <span class="attribute">id</span>=<span class="value">"userForm"</span> <span class="attribute">action</span>=<span class="value">"/xxx.do"</span> <span class="attribute">method</span>=<span class="value">"post"</span>&gt;</span></span><br><span class="line">	#CSRFToken()</span><br><span class="line">	...</span><br><span class="line"><span class="tag">&lt;/<span class="title">form</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="四、验证Token"><strong>四、验证Token</strong></h2><p>当请求提交后，在服务器端验证token值，在这里定义一个拦截器<code>CSRFHandlerInterceptor</code>:</p>
+<figure class="highlight java"><figcaption><span>CSRFHandlerInterceptor.java</span><a href="https://github.com/JavanLu/javan-blog/blob/master/springmvc-csrf-velocity/src/main/java/com/javan/security/CSRFHandlerInterceptor.java" target="_blank" rel="external">code view</a></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.javan.security;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.handler.HandlerInterceptorAdapter;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span><br><span class="line"> * A Spring MVC &lt;code&gt;HandlerInterceptor&lt;/code&gt; which is responsible to enforce CSRF token validity on incoming posts</span><br><span class="line"> * requests. The interceptor should be registered with Spring MVC servlet using the following syntax:</span><br><span class="line"> * </span><br><span class="line"> * &lt;mvc:interceptors&gt;</span><br><span class="line"> *     &lt;bean class="com.javan.security.CSRFHandlerInterceptor"/&gt;</span><br><span class="line"> * &lt;/mvc:interceptors&gt;</span><br><span class="line"> * </span><br><span class="line"> * <span class="doctag">@see</span> CSRFRequestDataValueProcessor</span><br><span class="line"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CSRFHandlerInterceptor</span> <span class="keyword">extends</span> <span class="title">HandlerInterceptorAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="annotation">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (handler <span class="keyword">instanceof</span> DefaultServletHttpRequestHandler) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (request.getMethod().equalsIgnoreCase(<span class="string">"GET"</span>)) &#123;</span><br><span class="line">			<span class="comment">// GET - allow the request</span></span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// This is a POST request - need to check the CSRF token</span></span><br><span class="line">			String sessionToken = CSRFTokenManager.getTokenForSession(request.getSession());</span><br><span class="line">			String requestToken = CSRFTokenManager.getTokenFromRequest(request);</span><br><span class="line">			<span class="keyword">if</span> (sessionToken.equals(requestToken)) &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				response.sendError(HttpServletResponse.SC_FORBIDDEN, <span class="string">"Bad or missing CSRF value"</span>);</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在bean配置文件中配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- CSRF Interceptor handlers --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">mvc:interceptors</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">bean</span> <span class="attribute">class</span>=<span class="value">"com.javan.security.CSRFHandlerInterceptor"</span> /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">mvc:interceptors</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="五、注意事项"><strong>五、注意事项</strong></h2><p>如果项目<code>web.xml</code>中指定了<code>error-page</code>错误页面（比如403状态码对应的页面等），那么需要注意<code>CSRFHandlerInterceptor</code>拦截的问题。</p>
+<p>如果验证成功，请求将沿着处理链继续传递；如果验证失败，请求将被暂停，发出一个<code>HTTP 403</code>的状态代码作为响应。但是问题来了，如果设置了<code>error-page</code>，Servlet 容器会先根据响应状态码将原始请求转发(forward)到具体的错误页面，然后发送到客户端浏览器。由于使用了拦截器，这次forward请求会再次被拦截，验证方法也会被触发，会再次验证失败。前端看不到403的错误提示页面。具体解决方案参见<a href="http://blog.csdn.net/alphafox/article/details/8947117" target="_blank" rel="external">这篇文章</a><sup>[2]</sup>。</p>
+<p><strong>源码已放到Github上，有需要的童鞋请移步</strong> <em><a href="https://github.com/JavanLu/javan-blog/tree/master/springmvc-csrf-velocity" target="_blank" rel="external">这里</a></em>。</p>
+<blockquote>
+<h3 id="参考资料">参考资料</h3><p>[1] EYAL LUPU 的解决方案： <a href="http://blog.eyallupu.com/2012/04/csrf-defense-in-spring-mvc-31.html" target="_blank" rel="external">http://blog.eyallupu.com/2012/04/csrf-defense-in-spring-mvc-31.html</a></p>
+<p>[2] 再谈Spring MVC中对于CSRF攻击的防御：<a href="http://blog.csdn.net/alphafox/article/details/8947117" target="_blank" rel="external">http://blog.csdn.net/alphafox/article/details/8947117</a></p>
+</blockquote>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/CSRF/" rel="tag">#CSRF</a>
+          
+            <a href="/tags/Spring/" rel="tag">#Spring</a>
+          
+            <a href="/tags/安全/" rel="tag">#安全</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/09/30/distributed-algorithms-in-nosql/" rel="prev">[转] NoSQL数据库的分布式算法</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/09/27/octopress-href-target-blank/" rel="next">Octopress中设置markdown超链接target</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2013/09/29/springmvc-csrf-defense/"
+                   data-title="一种在SpirngMVC3中防御CSRF攻击的实现" data-url="http://yoursite.com/2013/09/29/springmvc-csrf-defense/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="http://www.gravatar.com/avatar/f1d8cf8dbe2d0ce8d8255810a3138fa2?s=160" alt="JavanLu" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">JavanLu</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Still Waters Run Deep.</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、方案概要"><span class="nav-number">1.</span> <span class="nav-text">一、方案概要</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、Token生成"><span class="nav-number">2.</span> <span class="nav-text">二、Token生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、Token依附到Form"><span class="nav-number">3.</span> <span class="nav-text">三、Token依附到Form</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、验证Token"><span class="nav-number">4.</span> <span class="nav-text">四、验证Token</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、注意事项"><span class="nav-number">5.</span> <span class="nav-text">五、注意事项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2013 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JavanLu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"javansblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
