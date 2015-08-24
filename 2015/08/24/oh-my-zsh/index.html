@@ -28,7 +28,7 @@
 
 
 
-  <meta name="keywords" content="octopress," />
+  <meta name="keywords" content="Mac,zsh," />
 
 
 
@@ -37,16 +37,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="在使用Markdown语法生成超链接的时候，默认是在本窗口打开的。但是这会影响阅读体验，如果能将超链接在新窗口中打开就OK了。一种方案是使用HTML语法，但是这样破坏了写作时的体验，无法体现markdown的简洁性。好在Octopress可以很自由地定制新的功能。">
+<meta name="description" content="作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell这货，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Octopress中设置markdown超链接target">
-<meta property="og:url" content="http://yoursite.com/2013/09/27/octopress-href-target-blank/index.html">
+<meta property="og:title" content="Mac OSX下安装和使用oh-my-zsh">
+<meta property="og:url" content="http://yoursite.com/2015/08/24/oh-my-zsh/index.html">
 <meta property="og:site_name" content="Javan's Blog">
-<meta property="og:description" content="在使用Markdown语法生成超链接的时候，默认是在本窗口打开的。但是这会影响阅读体验，如果能将超链接在新窗口中打开就OK了。一种方案是使用HTML语法，但是这样破坏了写作时的体验，无法体现markdown的简洁性。好在Octopress可以很自由地定制新的功能。">
-<meta property="og:updated_time" content="2015-08-19T14:34:22.000Z">
+<meta property="og:description" content="作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell这货，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。">
+<meta property="og:updated_time" content="2015-08-24T16:02:55.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Octopress中设置markdown超链接target">
-<meta name="twitter:description" content="在使用Markdown语法生成超链接的时候，默认是在本窗口打开的。但是这会影响阅读体验，如果能将超链接在新窗口中打开就OK了。一种方案是使用HTML语法，但是这样破坏了写作时的体验，无法体现markdown的简洁性。好在Octopress可以很自由地定制新的功能。">
+<meta name="twitter:title" content="Mac OSX下安装和使用oh-my-zsh">
+<meta name="twitter:description" content="作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell这货，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -56,7 +56,7 @@
   };
 </script>
 
-  <title> Octopress中设置markdown超链接target | Javan's Blog </title>
+  <title> Mac OSX下安装和使用oh-my-zsh | Javan's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -184,7 +184,7 @@
           
           
             
-              Octopress中设置markdown超链接target
+              Mac OSX下安装和使用oh-my-zsh
             
           
         </h1>
@@ -193,8 +193,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2013-09-27T16:19:00+08:00" content="2013-09-27">
-            2013-09-27
+          <time itemprop="dateCreated" datetime="2015-08-24T11:58:44+08:00" content="2015-08-24">
+            2015-08-24
           </time>
         </span>
 
@@ -219,8 +219,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2013/09/27/octopress-href-target-blank/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2013/09/27/octopress-href-target-blank/" itemprop="commentsCount"></span>
+              <a href="/2015/08/24/oh-my-zsh/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/08/24/oh-my-zsh/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -234,13 +234,67 @@
       
 
       
-        <span itemprop="articleBody"><p>在使用Markdown语法生成超链接的时候，默认是在本窗口打开的。但是这会影响阅读体验，如果能将超链接在新窗口中打开就OK了。一种方案是使用HTML语法，但是这样破坏了写作时的体验，无法体现markdown的简洁性。好在Octopress可以很自由地定制新的功能。<br><a id="more"></a><br>Octopress的<a href="https://github.com/imathis/octopress/issues/410" target="_blank" rel="external">Issues: Open links in a new window</a><sup>[1]</sup>中给出了几种可行的方案，我选择了<a href="https://gist.github.com/azone/4523641" target="_blank" rel="external">azone的方案</a><sup>[2]</sup>。在<code>octopress\source\_includes\custom\head.html</code>中添加如下代码：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;script type=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">addBlankTargetForLinks</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  $(<span class="string">'a[href^="http"]'</span>).each(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">      $(<span class="keyword">this</span>).attr(<span class="string">'target'</span>, <span class="string">'_blank'</span>);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$(<span class="built_in">document</span>).bind(<span class="string">'DOMNodeInserted'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">event</span>) </span>&#123;</span><br><span class="line">  addBlankTargetForLinks();</span><br><span class="line">&#125;);</span><br><span class="line"><span class="xml"><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+        <span itemprop="articleBody"><p>作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell这货，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。</p>
+<a id="more"></a>
+<h2 id="安装zsh">安装zsh</h2><p>通过指令查看你的系统支持哪几种shell。运行<code>cat /etc/shells</code>,Mac系统显示如下：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/bin/</span>bash</span><br><span class="line"><span class="regexp">/bin/</span>csh</span><br><span class="line"><span class="regexp">/bin/</span>ksh</span><br><span class="line"><span class="regexp">/bin/</span>sh</span><br><span class="line"><span class="regexp">/bin/</span>tcsh</span><br><span class="line"><span class="regexp">/bin/</span>zsh</span><br></pre></td></tr></table></figure></p>
+<p>如上所示，如果是Mac系统，无需再重新安装zsh。<br>如果是Redhat Linux，执行<code>sudo yum install zsh</code>。<br>如果是Ubuntu Linux，执行<code>sudo apt-get install zsh</code>。<br>安装完成后，将当前用户使用的shell切换成zsh: <code>chsh -s /bin/zsh</code>，请不要担心bash的命令无法使用，因为zsh是完全兼容bash的。</p>
 <blockquote>
-<h3 id="参考资料">参考资料</h3><p>[1] Issues: Open links in a new window: <a href="https://github.com/imathis/octopress/issues/410" target="_blank" rel="external">https://github.com/imathis/octopress/issues/410</a></p>
-<p>[2] azone的方案：<a href="https://gist.github.com/azone/4523641" target="_blank" rel="external">https://gist.github.com/azone/4523641</a> </p>
+<p>如果你在 .bashrc 或者 .bash_profile 中设置了PATH或者自定义了一些alias等，需要将这些配置配置到.zshrc中，并执行一下<code>source ~/.zshrc</code>，这样原先的使用都不受影响。</p>
 </blockquote>
-</span>
+<h2 id="安装oh-my-zsh">安装oh-my-zsh</h2><p>自动安装：<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget http<span class="variable">s:</span>//github.<span class="keyword">com</span>/robbyrussell/oh-my-zsh/raw/master/tools/install.<span class="keyword">sh</span> -O - | <span class="keyword">sh</span></span><br></pre></td></tr></table></figure></p>
+<p>手动安装：<br><figure class="highlight nimrod"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh</span><br><span class="line">cp ~/.oh-my-zsh/templates/zshrc.zsh-<span class="keyword">template</span> ~/.zshrc</span><br></pre></td></tr></table></figure></p>
+<h2 id="配置">配置</h2><p>zsh的配置主要集中在用户目录下的.zshrc，可以在该文件中对环境变量以及别名进行设置。我的常用配置如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">alias</span> subl=\<span class="string">''</span>/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl<span class="string">'\'</span></span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> markdown=subl</span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> md=subl<span class="comment">#在命令行直接输入后缀为md的文件名，会在sublime text中打开</span></span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> <span class="built_in">log</span>=vim</span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> txt=vim</span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> gz=<span class="string">'tar -xzvf'</span></span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> tgz=<span class="string">'tar -xzvf'</span></span><br></pre></td></tr></table></figure></p>
+<p>zsh 既可以设置通用别名，还能针对文件类型设置对应的打开程序，比如：<br>alias -s md=subl，意思就是你在命令行输入 hello.md，zsh会为你自动打开 sublime text 并读取 hello.md； alias -s gz=’tar -xzvf’，表示自动解压后缀为 gz 的压缩包。</p>
+<p>zsh拥有很多强大的功能，可以去.zshrc中看那些配置的具体说明，很多默认是被注释掉的，去掉注释即可打开相关特性。现在通过几行配置打开zsh强大的补全与纠错功能。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># completion</span></span><br><span class="line"><span class="built_in">autoload</span> -U compinit</span><br><span class="line">compinit</span><br><span class="line"></span><br><span class="line"><span class="comment"># correction</span></span><br><span class="line"><span class="built_in">setopt</span> correctall</span><br><span class="line"></span><br><span class="line"><span class="comment"># prompt</span></span><br><span class="line"><span class="built_in">autoload</span> -U promptinit</span><br><span class="line">promptinit</span><br></pre></td></tr></table></figure></p>
+<p>补全功能使得你只需要输入开头或者其中的几个字母，通过tab键就可以自动补全正确的目录活着文件名。纠错功能使得你输入<code>gti</code>时会提示呢是否换成<code>git</code>。</p>
+<blockquote>
+<p>注意：vim的补全时可能会报错<code>_arguments:450: _vim_files: function definition file not found</code>，此时只需要删掉 ~/.zcompdump，关闭shell窗口，重新进入即可。</p>
+</blockquote>
+<p>另外，可以在.zshrc中通过设置<code>ZSH_THEME=”robbyrussell”</code>来改变主题，~/.oh-my-zsh/themes/目录下有很多主题。我使用的是默认的主题，只不过做了一点小改动：<br><figure class="highlight dos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PROMPT='<span class="envvar">%&#123;$fg_bold[red]%</span>&#125;➜ <span class="envvar">%&#123;$fg_bold[green]%</span>&#125;<span class="envvar">%p%</span>&#123;$fg[cyan]<span class="envvar">%&#125;%</span>d <span class="envvar">%&#123;$fg_bold[blue]%</span>&#125;$(git_prompt_info)<span class="envvar">%&#123;$fg_bold[blue]%</span>&#125;% <span class="envvar">%&#123;$reset_color%</span>&#125;$'</span><br><span class="line">#PROMPT='<span class="envvar">%&#123;$fg_bold[red]%</span>&#125;➜ <span class="envvar">%&#123;$fg_bold[green]%</span>&#125;%p <span class="envvar">%&#123;$fg[cyan]%</span>&#125;%c <span class="envvar">%&#123;$fg_bold[blue]%</span>&#125;$(git_prompt_info)<span class="envvar">%&#123;$fg_bold[blue]%</span>&#125; % <span class="envvar">%&#123;$reset_color%</span>&#125;'</span><br></pre></td></tr></table></figure></p>
+<p>将c改成了d，表示绝对路径，在末尾加上了一个$。</p>
+<h2 id="插件">插件</h2><p>oh-my-zsh自带了很多好用的插件，位于~/.oh-my-zsh/plugins/目录下，开启时只需在.zshrc中找到<code>plugins=(git)</code>，将想加的插件的名字添加进去即可。比如<code>plugins=(git z)</code>就开启了git和z两个插件。下面列出几个常用的自带插件。</p>
+<h3 id="z">z</h3><p>这是个自带的但是没有开启的插件，类似于autojump。比如经常进入~/Documents目录，按下 z doc 一般它就可以跳进去了(当然首先你得用一段时间让它积累一下数据才能用)。</p>
+<h3 id="d">d</h3><p>按一下 d 再回车你会看到最近的历史记录，可以通过数字比如 1, 2 之类的返回到某个历史记录中了。</p>
+<h3 id="zsh_stats">zsh_stats</h3><p>zsh_stats 可以看到你的使用频率前 20 的命令。</p>
+<h3 id="Git_Aliases">Git Aliases</h3><p>git 插件是默认开启的，它能够自动补全以及显示所在 branch。下面列出常用的git命令别名。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Alias</th>
+<th style="text-align:left">Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">g</td>
+<td style="text-align:left">git</td>
+</tr>
+<tr>
+<td style="text-align:left">gst</td>
+<td style="text-align:left">git status</td>
+</tr>
+<tr>
+<td style="text-align:left">ga</td>
+<td style="text-align:left">git add</td>
+</tr>
+<tr>
+<td style="text-align:left">gp</td>
+<td style="text-align:left">git push</td>
+</tr>
+<tr>
+<td style="text-align:left">gl</td>
+<td style="text-align:left">git pull</td>
+</tr>
+<tr>
+<td style="text-align:left">gc</td>
+<td style="text-align:left">git commit -v</td>
+</tr>
+</tbody>
+</table>
+<p>更多自带的插件用法请参见<a href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins-Overview" target="_blank" rel="external">Plugins Overview</a>，</p>
+<h2 id="小技巧">小技巧</h2><pre><code><span class="number">1</span>. 在当前目录下输入 .. 或 … ，或直接输入当前目录名都可以跳转，你甚至不再需要输入 <span class="keyword">cd</span> 命令。
+<span class="number">2</span>. 通配符搜索：<span class="keyword">ls</span> -<span class="keyword">l</span> **/*.<span class="keyword">sh</span>，可以递归显示当前目录下的 <span class="keyword">shell</span> 文件，文件少时可以代替 <span class="keyword">find</span>。
+</code></pre></span>
       
     </div>
 
@@ -248,7 +302,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/octopress/" rel="tag">#octopress</a>
+            <a href="/tags/Mac/" rel="tag">#Mac</a>
+          
+            <a href="/tags/zsh/" rel="tag">#zsh</a>
           
         </div>
       
@@ -257,13 +313,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2013/09/29/springmvc-csrf-defense/" rel="prev">一种在SpirngMVC3中防御CSRF攻击的实现</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2013/09/27/csrf-brief-analysis/" rel="next">浅析CSRF</a>
+              <a href="/2015/08/21/BerkeleyDB-study-note/" rel="next">BerkeleyDB学习笔记</a>
             
           </div>
         </div>
@@ -311,8 +365,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2013/09/27/octopress-href-target-blank/"
-                   data-title="Octopress中设置markdown超链接target" data-url="http://yoursite.com/2013/09/27/octopress-href-target-blank/">
+              <div class="ds-thread" data-thread-key="2015/08/24/oh-my-zsh/"
+                   data-title="Mac OSX下安装和使用oh-my-zsh" data-url="http://yoursite.com/2015/08/24/oh-my-zsh/">
               </div>
             
           </div>
@@ -394,7 +448,7 @@
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">1.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#安装zsh"><span class="nav-number">1.</span> <span class="nav-text">安装zsh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装oh-my-zsh"><span class="nav-number">2.</span> <span class="nav-text">安装oh-my-zsh</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置"><span class="nav-number">3.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插件"><span class="nav-number">4.</span> <span class="nav-text">插件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#z"><span class="nav-number">4.1.</span> <span class="nav-text">z</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#d"><span class="nav-number">4.2.</span> <span class="nav-text">d</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zsh_stats"><span class="nav-number">4.3.</span> <span class="nav-text">zsh_stats</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git_Aliases"><span class="nav-number">4.4.</span> <span class="nav-text">Git Aliases</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#小技巧"><span class="nav-number">5.</span> <span class="nav-text">小技巧</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
