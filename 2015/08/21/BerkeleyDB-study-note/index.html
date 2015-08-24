@@ -49,7 +49,7 @@
 
 能够高效率的处理1到1百万条记录，制约JE数据库的往往是硬件系统,而不是JE本身。 
 多线程支持，JE使用超时的方式来处理线程间的死琐">
-<meta property="og:updated_time" content="2015-08-22T14:49:23.000Z">
+<meta property="og:updated_time" content="2015-08-23T09:33:49.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="BerkeleyDB学习笔记">
 <meta name="twitter:description" content="简介BerkeleyDB（BDB）是一个高效的嵌入式数据库，C、C++、Java、Perl、Python等很多其他语言都有对应的API。Berkeley DB Java Edition (JE) 完全用JAVA写的，它适合于管理海量的，简单的数据。具有如下特点：
@@ -255,6 +255,7 @@
 <li>数据备份和恢复。 </li>
 <li>支持游标。 </li>
 </ul>
+<a id="more"></a>
 <p>BDB(JE)的入门文档请参见 <a href="http://oss.org.cn/ossdocs/berkeley/je-1.5.1/docs/GettingStartedGuide/BerkeleyDB-JE-GSG.pdf" target="_blank" rel="external">《Getting Started With BerkeleyDB Java Edition》</a>，版本有点老了，但是基本够用，因为API基本未怎么变动。</p>
 <h2 id="BDB增删改查的两种方式">BDB增删改查的两种方式</h2><p>下面通过代码来演示BDB的基本操作。</p>
 <h3 id="引入BDB(JE)的pom">引入BDB(JE)的pom</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="title">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>com.sleepycat<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>je<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">version</span>&gt;</span>5.0.73<span class="tag">&lt;/<span class="title">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
