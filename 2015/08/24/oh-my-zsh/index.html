@@ -37,16 +37,16 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell这货，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。">
+<meta name="description" content="作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mac OSX下安装和使用oh-my-zsh">
 <meta property="og:url" content="http://yoursite.com/2015/08/24/oh-my-zsh/index.html">
 <meta property="og:site_name" content="Javan's Blog">
-<meta property="og:description" content="作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell这货，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。">
-<meta property="og:updated_time" content="2015-08-24T16:02:55.000Z">
+<meta property="og:description" content="作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。">
+<meta property="og:updated_time" content="2015-08-26T13:05:41.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Mac OSX下安装和使用oh-my-zsh">
-<meta name="twitter:description" content="作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell这货，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。">
+<meta name="twitter:description" content="作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -234,7 +234,7 @@
       
 
       
-        <span itemprop="articleBody"><p>作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell这货，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。</p>
+        <span itemprop="articleBody"><p>作为代码狗，每天要在命令行上浪费N多绳命。当你为Mac上难用的bash咬牙切齿的时候，殊不知OSX已自带了另一种好用得不得了的shell：zsh。但是由于配置过于复杂，如果想爽快地使用的话，有必要安装oh-my-shell，真的十分好用。本文就将介绍oh-my-zsh的安装使用以及一些技巧。</p>
 <a id="more"></a>
 <h2 id="安装zsh">安装zsh</h2><p>通过指令查看你的系统支持哪几种shell。运行<code>cat /etc/shells</code>,Mac系统显示如下：<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="regexp">/bin/</span>bash</span><br><span class="line"><span class="regexp">/bin/</span>csh</span><br><span class="line"><span class="regexp">/bin/</span>ksh</span><br><span class="line"><span class="regexp">/bin/</span>sh</span><br><span class="line"><span class="regexp">/bin/</span>tcsh</span><br><span class="line"><span class="regexp">/bin/</span>zsh</span><br></pre></td></tr></table></figure></p>
 <p>如上所示，如果是Mac系统，无需再重新安装zsh。<br>如果是Redhat Linux，执行<code>sudo yum install zsh</code>。<br>如果是Ubuntu Linux，执行<code>sudo apt-get install zsh</code>。<br>安装完成后，将当前用户使用的shell切换成zsh: <code>chsh -s /bin/zsh</code>，请不要担心bash的命令无法使用，因为zsh是完全兼容bash的。</p>
@@ -246,7 +246,7 @@
 <h2 id="配置">配置</h2><p>zsh的配置主要集中在用户目录下的.zshrc，可以在该文件中对环境变量以及别名进行设置。我的常用配置如下：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">alias</span> subl=\<span class="string">''</span>/Applications/Sublime Text.app/Contents/SharedSupport/bin/subl<span class="string">'\'</span></span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> markdown=subl</span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> md=subl<span class="comment">#在命令行直接输入后缀为md的文件名，会在sublime text中打开</span></span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> <span class="built_in">log</span>=vim</span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> txt=vim</span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> gz=<span class="string">'tar -xzvf'</span></span><br><span class="line"><span class="built_in">alias</span> <span class="operator">-s</span> tgz=<span class="string">'tar -xzvf'</span></span><br></pre></td></tr></table></figure></p>
 <p>zsh 既可以设置通用别名，还能针对文件类型设置对应的打开程序，比如：<br>alias -s md=subl，意思就是你在命令行输入 hello.md，zsh会为你自动打开 sublime text 并读取 hello.md； alias -s gz=’tar -xzvf’，表示自动解压后缀为 gz 的压缩包。</p>
 <p>zsh拥有很多强大的功能，可以去.zshrc中看那些配置的具体说明，很多默认是被注释掉的，去掉注释即可打开相关特性。现在通过几行配置打开zsh强大的补全与纠错功能。<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># completion</span></span><br><span class="line"><span class="built_in">autoload</span> -U compinit</span><br><span class="line">compinit</span><br><span class="line"></span><br><span class="line"><span class="comment"># correction</span></span><br><span class="line"><span class="built_in">setopt</span> correctall</span><br><span class="line"></span><br><span class="line"><span class="comment"># prompt</span></span><br><span class="line"><span class="built_in">autoload</span> -U promptinit</span><br><span class="line">promptinit</span><br></pre></td></tr></table></figure></p>
-<p>补全功能使得你只需要输入开头或者其中的几个字母，通过tab键就可以自动补全正确的目录活着文件名。纠错功能使得你输入<code>gti</code>时会提示呢是否换成<code>git</code>。</p>
+<p>补全功能使得你只需要输入开头或者其中的几个字母，通过tab键就可以自动补全正确的目录活着文件名。纠错功能使得你输入<code>gti</code>时会提示是否换成<code>git</code>。</p>
 <blockquote>
 <p>注意：vim的补全时可能会报错<code>_arguments:450: _vim_files: function definition file not found</code>，此时只需要删掉 ~/.zcompdump，关闭shell窗口，重新进入即可。</p>
 </blockquote>
@@ -292,9 +292,11 @@
 </tbody>
 </table>
 <p>更多自带的插件用法请参见<a href="https://github.com/robbyrussell/oh-my-zsh/wiki/Plugins-Overview" target="_blank" rel="external">Plugins Overview</a>，</p>
-<h2 id="小技巧">小技巧</h2><pre><code><span class="number">1</span>. 在当前目录下输入 .. 或 … ，或直接输入当前目录名都可以跳转，你甚至不再需要输入 <span class="keyword">cd</span> 命令。
-<span class="number">2</span>. 通配符搜索：<span class="keyword">ls</span> -<span class="keyword">l</span> **/*.<span class="keyword">sh</span>，可以递归显示当前目录下的 <span class="keyword">shell</span> 文件，文件少时可以代替 <span class="keyword">find</span>。
-</code></pre></span>
+<h2 id="小技巧">小技巧</h2><ul>
+<li>在当前目录下输入 .. 或 … ，或直接输入当前目录名都可以跳转，你甚至不再需要输入 cd 命令。</li>
+<li>通配符搜索：ls -l <em>*/</em>.sh，可以递归显示当前目录下的 shell 文件，文件少时可以代替 find。</li>
+</ul>
+</span>
       
     </div>
 
@@ -312,6 +314,8 @@
       
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/08/26/how-to-build-a-blog-by-hexo/" rel="prev">使用Hexo搭建博客</a>
             
           </div>
 
@@ -420,7 +424,7 @@
 
           <div class="site-state-item site-state-tags">
             <a href="/tags">
-              <span class="site-state-item-count">14</span>
+              <span class="site-state-item-count">15</span>
               <span class="site-state-item-name">标签</span>
               </a>
           </div>
