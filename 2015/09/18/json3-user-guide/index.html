@@ -1,0 +1,745 @@
+<!doctype html>
+<html class="theme-next use-motion theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.1"/>
+
+
+    <meta name="description" content="Still Waters Run Deep." />
+
+
+
+  <meta name="keywords" content="JSON," />
+
+
+
+
+
+  <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
+
+
+<meta name="description" content="JSON3是时下流行的兼容了包括IE6、Opera7、Safari2和Netscape6等多个Javascript平台的JSON实现方案，目前的版本号是3.3.2。JSON是建立在松散的JavaScript语法集合之上、与编程语言无关的数据交换格式。该格式最初由Douglas Crockford提出，在第五版的 ECMAScript规范被标准化。2011年被批准的5.1版本修订了若干个关于日期序列">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JSON3入门">
+<meta property="og:url" content="http://yoursite.com/2015/09/18/json3-user-guide/index.html">
+<meta property="og:site_name" content="Javan's Blog">
+<meta property="og:description" content="JSON3是时下流行的兼容了包括IE6、Opera7、Safari2和Netscape6等多个Javascript平台的JSON实现方案，目前的版本号是3.3.2。JSON是建立在松散的JavaScript语法集合之上、与编程语言无关的数据交换格式。该格式最初由Douglas Crockford提出，在第五版的 ECMAScript规范被标准化。2011年被批准的5.1版本修订了若干个关于日期序列">
+<meta property="og:updated_time" content="2015-10-18T11:11:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JSON3入门">
+<meta name="twitter:description" content="JSON3是时下流行的兼容了包括IE6、Opera7、Safari2和Netscape6等多个Javascript平台的JSON实现方案，目前的版本号是3.3.2。JSON是建立在松散的JavaScript语法集合之上、与编程语言无关的数据交换格式。该格式最初由Douglas Crockford提出，在第五版的 ECMAScript规范被标准化。2011年被批准的5.1版本修订了若干个关于日期序列">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'post'
+  };
+</script>
+
+  <title> JSON3入门 | Javan's Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><h1 class="site-meta">
+  <span class="logo-line-before"><i></i></span>
+  <a href="/" class="brand" rel="start">
+      <span class="logo">
+        <i class="icon-next-logo"></i>
+      </span>
+      <span class="site-title">Javan's Blog</span>
+  </a>
+  <span class="logo-line-after"><i></i></span>
+</h1>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu menu-left">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            <i class="menu-item-icon icon-next-home"></i> <br />
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            <i class="menu-item-icon icon-next-archives"></i> <br />
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            <i class="menu-item-icon icon-next-categories"></i> <br />
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            <i class="menu-item-icon icon-next-tags"></i> <br />
+            标签
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  
+  <form class="site-search-form">
+    <input type="text" id="st-search-input" class="st-search-input st-default-search-input" />
+  </form>
+
+
+<script type="text/javascript">
+  (function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+    (w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+    e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+  })(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+  _st('install', 'hV94zB5BAjdxzas-hytK','2.0.0');
+</script>
+
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      
+      
+        <h1 class="post-title" itemprop="name headline">
+          
+          
+            
+              JSON3入门
+            
+          
+        </h1>
+      
+
+      <div class="post-meta">
+        <span class="post-time">
+          发表于
+          <time itemprop="dateCreated" datetime="2015-09-18T10:31:37+08:00" content="2015-09-18">
+            2015-09-18
+          </time>
+        </span>
+
+        
+          <span class="post-category" >
+            &nbsp; | &nbsp; 分类于
+            
+              <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                <a href="/categories/技术/" itemprop="url" rel="index">
+                  <span itemprop="name">技术</span>
+                </a>
+              </span>
+
+              
+              
+
+            
+          </span>
+        
+
+        
+          
+            <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/09/18/json3-user-guide/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/09/18/json3-user-guide/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+          
+        
+      </div>
+    </header>
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>JSON3是时下流行的兼容了包括IE6、Opera7、Safari2和Netscape6等多个Javascript平台的JSON实现方案，目前的版本号是3.3.2。JSON是建立在松散的JavaScript语法集合之上、与编程语言无关的数据交换格式。该格式最初由<a href="http://www.crockford.com/" target="_blank" rel="external">Douglas Crockford</a>提出，在第五版的 ECMAScript规范被标准化。2011年被批准的5.1版本修订了若干个关于日期序列化的语法。</p>
+<p>JSON3暴露出两个功能：<code>stringify()</code>将JavaScript对象序列化成JSON，<code>parse()</code>从JSON字符串中转换成 JavaScript 对象。这是对 JSON2 的一个嵌入式替换。除了不符合下面提到的日期序列化，这两个函数完全遵照ECMAScript的规范。</p>
+<a id="more"></a>
+<p>JSON3解析不使用eval和正则表达式，为在边界明确的过时的或者移动环境下提供了良好的安全性和性能。<a href="http://jsperf.com/" target="_blank" rel="external">jsPref</a>上提供了完整的<a href="http://jsperf.com/json3" target="_blank" rel="external">基线测试集</a>。</p>
+<h2 id="对比JSON2">对比JSON2</h2><p>JSON3：</p>
+<blockquote>
+<ul>
+<li>正确的序列化原始包装对象；</li>
+<li>当序列化循环结构时会抛出<code>TypeError</code>(JSON2直到调用堆栈溢出)；</li>
+<li>利用特征测试去检测损坏的或不完整的原生JSON实现(JSON2只检查的本地函数的存在。 测试只在运行时执行一次，所以分析或序列化值时，没有额外的性能开销。</li>
+</ul>
+</blockquote>
+<p>JSON3 v3.2.3完全兼容Prototype 1.6.1和之前的版本。<br>与JSON2对比，JSON3没有：</p>
+<blockquote>
+<ul>
+<li>为Boolean、Number和String添加<code>toJSON()</code>方法。关于这部分没有任何标准，并且让<code>stringify()</code>实现的设计显得多余。</li>
+<li>为Date.prototype添加<code>toJSON()</code>和<code>toISOString()</code>方法。具体参加下面日期序列化部分。</li>
+</ul>
+</blockquote>
+<h2 id="日期序列化">日期序列化</h2><p>JSON3没有定义<code>Date#toISOString()</code>或者<code>Date#toJSON()</code>，使其脱离了规范定义。这使其兼容了CommonJS,同时避免污染native原型。相应地，日期序列化在其内部由stringify()高效地实现了。如果一个日期对象没有自定义toJSON()方法，它将被序列化为一个<a href="http://es5.github.io/#x15.9.1.15" target="_blank" rel="external">简单的ISO 8601日期时间字符串</a>。</p>
+<p>几个本地的<code>Date#toJSON</code>实现生成的日期时间字符串在规范上并不符合语法。比如，所有的Safari 4 以及 JSON2，不能正确序列扩展的年。另外，JSON2和旧的实现省略了日期时间字符串中的毫秒。(在ES 5中是可选择的，在5.1中是必须要求的。) 最后在 Safari 4和5的所有版本中,序列化一个无效的日期会产生一个”Invalid Date”，而不是null ；这些环境展现了其他序列化错误，但是JSON3将覆盖本地<code>stringify()</code>实现。</p>
+<p>部分日期序列化代码改自<a href="https://github.com/Yaffle/date-shim" target="_blank" rel="external">date-shim工程</a>。</p>
+<h2 id="使用示例">使用示例</h2><h3 id="页面代码">页面代码</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=<span class="string">"//cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="coffeescript"></span><br><span class="line">  JSON.stringify(&#123;<span class="string">"Hello"</span>: <span class="number">123</span>&#125;);</span><br><span class="line">  <span class="regexp">//</span> =&gt; <span class="string">'&#123;"Hello":123&#125;'</span></span><br><span class="line">  JSON.parse(<span class="string">"[[1, 2, 3], 1, 2, 3, 4]"</span>, <span class="reserved">function</span> (key, value) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> value == <span class="string">"number"</span>) &#123;</span><br><span class="line">      value = value % <span class="number">2</span> ? <span class="string">"Odd"</span> : <span class="string">"Even"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="regexp">//</span> =&gt; [[<span class="string">"Odd"</span>, <span class="string">"Even"</span>, <span class="string">"Odd"</span>], <span class="string">"Odd"</span>, <span class="string">"Even"</span>, <span class="string">"Odd"</span>, <span class="string">"Even"</span>]</span><br><span class="line"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure>
+<p>当在web浏览器中使用时，JSON3暴露了一个额外的包含<code>noConfict()</code>和<code>renlnContext()</code>函数的JSON3对象,以及别名为<code>stringify()</code>和<code>parse()</code>函数。</p>
+<p><strong>noConfict()和renlnContext()函数</strong></p>
+<blockquote>
+<ul>
+<li>JSON3.noConflict() 还原全局JSON对象的原始值，返回一个引用JSON3对象；</li>
+<li>JSON3.runInContext([context, exports])使用给定上下文对象初始化JSON3，(比如window、 global等)，或在忽略下的全局对象。如果指定了暴露对象，stringify()、parse()和 runInContext() 函数将会附着它来代替一个新的对象。</li>
+</ul>
+</blockquote>
+<h3 id="异步模块加载">异步模块加载</h3><p>为了兼容RequiredJS、curl.js以及其他异步模块加载机制，JSON3定义了一个异步模块。<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;script src=<span class="string">"//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.js"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="javascript"></span><br><span class="line">  <span class="built_in">require</span>(&#123;</span><br><span class="line">    <span class="string">"paths"</span>: &#123;</span><br><span class="line">      <span class="string">"json3"</span>: <span class="string">"./path/to/json3"</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, [<span class="string">"json3"</span>], <span class="function"><span class="keyword">function</span> (<span class="params">JSON</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">JSON</span>.parse(<span class="string">"[1, 2, 3]"</span>);</span><br><span class="line">    <span class="comment">// =&gt; [1, 2, 3]</span></span><br><span class="line">  &#125;);</span><br><span class="line"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span></span><br></pre></td></tr></table></figure></p>
+<p>为避免与第三方脚本的问题，即使在模块加载器中使用，JSON3 也暴露到全局范围。如果这种行为不是期望的，<code>JSON3.noConflict()</code>可用于全局JSON对象恢复其原始值。<br>注：如果您打算在其他模块边使用JSON3，请不要简单地将这些模块组合串连在一起，因为这将导致一个脚本重复定义调用从而引起AMD装载机的错误。如果需要在生产环境使用压缩的js文件，可以使用r.js。</p>
+<h3 id="CommonJS环境">CommonJS环境</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> JSON3 = <span class="built_in">require</span>(<span class="string">"./path/to/json3"</span>);</span><br><span class="line">JSON3.parse(<span class="string">"[1, 2, 3]"</span>);</span><br><span class="line"><span class="comment">// =&gt; [1, 2, 3]</span></span><br></pre></td></tr></table></figure>
+<h3 id="JavaScript引擎">JavaScript引擎</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">load(<span class="string">"path/to/json3.js"</span>);</span><br><span class="line"><span class="built_in">JSON</span>.stringify(&#123;<span class="string">"Hello"</span>: <span class="number">123</span>, <span class="string">"Good-bye"</span>: <span class="number">456</span>&#125;, [<span class="string">"Hello"</span>], <span class="string">"\t"</span>);</span><br><span class="line"><span class="comment">// =&gt; '&#123;\n\t"Hello": 123\n&#125;'</span></span><br></pre></td></tr></table></figure>
+<h3 id="stringify使用示例">stringify使用示例</h3><p>JSON.stringify(value [, replacer] [, space])</p>
+<blockquote>
+<ul>
+<li>value：是必须要的字段。就是你输入的对象，比如数组啊，类啊等等。</li>
+<li>replacer：可选，分为2种方式：一种是方法，第二种是数组。</li>
+<li>space：可选，定义缩进几个字符。</li>
+</ul>
+</blockquote>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> preview = <span class="built_in">JSON</span>.stringify(value, <span class="function"><span class="keyword">function</span>(<span class="params">key, value</span>)</span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(key == <span class="string">"Start_Time"</span> || key == <span class="string">"End_Time"</span>)&#123;</span><br><span class="line">        <span class="keyword">var</span> dt = <span class="built_in">Date</span>.parse(value);</span><br><span class="line">        value = dt/<span class="number">1000</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> value;</span><br><span class="line">&#125;, <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+<h2 id="兼容性">兼容性</h2><p>JSON3已经被以下网页浏览器、CommonJS环境以及JavaScript引擎测试。</p>
+<h3 id="网页浏览器">网页浏览器</h3><ul>
+<li>Windows IE 6.0或更高</li>
+<li>Mozilla Firefox 1.0或更高</li>
+<li>Apple Safari 2.0或更高</li>
+<li>Opera 7.02或更高</li>
+<li>Mozilla 1.0、Netscape 6.2.3和SeaMonkey 1.0 或更高</li>
+</ul>
+<h3 id="CommonJS环境-1">CommonJS环境</h3><ul>
+<li>Node 0.2.6或更高</li>
+<li>RingoJS 0.4或更高</li>
+<li>Narwhal 0.3.2或更高</li>
+</ul>
+<h3 id="JavaScript引擎-1">JavaScript引擎</h3><ul>
+<li>ozilla Rhino 1.5R5或更高</li>
+<li>WebKit JSC</li>
+<li>Google V8</li>
+</ul>
+<h3 id="已知的不兼容">已知的不兼容</h3><p>试图序列化参数对象可能在跨环境下由于不同的规范版本产生不一致的结果。作为一种变通方法，请先转换参数对象到一个数组：<code>JSON.stringify([].slice.call(arguments, 0))</code>。</p>
+<h3 id="所需本地方法">所需本地方法</h3><p>JSON3假设存在和ECMAScript规范中的功能描述一致的如下方法：</p>
+<ul>
+<li>The Number, String, Array, Object, Date, SyntaxError, and TypeError constructors.</li>
+<li>String.fromCharCode</li>
+<li>Object#toString</li>
+<li>Function#call</li>
+<li>Math.floor</li>
+<li>Number#toString</li>
+<li>Date#valueOf</li>
+<li>String.prototype: indexOf, charCodeAt, charAt, slice</li>
+<li>Array.prototype: push, pop, join</li>
+</ul>
+<h2 id="JSON3代码库">JSON3代码库</h2><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ git clone gi<span class="variable">t:</span>//github.<span class="keyword">com</span>/bestiejs/json3.git</span><br><span class="line">$ <span class="keyword">cd</span> json3</span><br></pre></td></tr></table></figure>
+<p>JSON3遵循MTI License。</p>
+<h2 id="参考文献">参考文献</h2><blockquote>
+<p>[1] <a href="http://bestiejs.github.io/json3/" target="_blank" rel="external">JSON3</a><br>[2] <a href="http://www.cnblogs.com/damonlan/archive/2012/03/13/2394787.html" target="_blank" rel="external">JSON.stringify 语法讲解</a></p>
+</blockquote>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JSON/" rel="tag">#JSON</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/11/linux-vmstat/" rel="prev">linux_vmstat</a>
+            
+          </div>
+
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/08/28/a-log-tools-based-on-annotation-and-aspectj/" rel="next">一种基于注解和切面的日志工具</a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        <!-- JiaThis Button BEGIN -->
+<div class="jiathis_style">
+  <a class="jiathis_button_tsina"></a>
+  <a class="jiathis_button_tqq"></a>
+  <a class="jiathis_button_weixin"></a>
+  <a class="jiathis_button_cqq"></a>
+  <a class="jiathis_button_douban"></a>
+  <a class="jiathis_button_renren"></a>
+  <a class="jiathis_button_qzone"></a>
+  <a class="jiathis_button_kaixin001"></a>
+  <a class="jiathis_button_copy"></a>
+  <a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis" target="_blank"></a>
+  <a class="jiathis_counter_style"></a>
+</div>
+<script type="text/javascript" >
+  var jiathis_config={
+    hideMore:false
+  }
+</script>
+<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+<!-- JiaThis Button END -->
+
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div class="ds-thread" data-thread-key="2015/09/18/json3-user-guide/"
+                   data-title="JSON3入门" data-url="http://yoursite.com/2015/09/18/json3-user-guide/">
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="http://www.gravatar.com/avatar/f1d8cf8dbe2d0ce8d8255810a3138fa2?s=160" alt="JavanLu" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">JavanLu</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Still Waters Run Deep.</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">27</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">分类</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">17</span>
+              <span class="site-state-item-name">标签</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#对比JSON2"><span class="nav-number">1.</span> <span class="nav-text">对比JSON2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#日期序列化"><span class="nav-number">2.</span> <span class="nav-text">日期序列化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用示例"><span class="nav-number">3.</span> <span class="nav-text">使用示例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#页面代码"><span class="nav-number">3.1.</span> <span class="nav-text">页面代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步模块加载"><span class="nav-number">3.2.</span> <span class="nav-text">异步模块加载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CommonJS环境"><span class="nav-number">3.3.</span> <span class="nav-text">CommonJS环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JavaScript引擎"><span class="nav-number">3.4.</span> <span class="nav-text">JavaScript引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stringify使用示例"><span class="nav-number">3.5.</span> <span class="nav-text">stringify使用示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#兼容性"><span class="nav-number">4.</span> <span class="nav-text">兼容性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#网页浏览器"><span class="nav-number">4.1.</span> <span class="nav-text">网页浏览器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CommonJS环境-1"><span class="nav-number">4.2.</span> <span class="nav-text">CommonJS环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JavaScript引擎-1"><span class="nav-number">4.3.</span> <span class="nav-text">JavaScript引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#已知的不兼容"><span class="nav-number">4.4.</span> <span class="nav-text">已知的不兼容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#所需本地方法"><span class="nav-number">4.5.</span> <span class="nav-text">所需本地方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON3代码库"><span class="nav-number">5.</span> <span class="nav-text">JSON3代码库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">6.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; &nbsp;  2013 - 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">JavanLu</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"javansblog"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+    
+     
+  	<script src="/js/ua-parser.min.js"></script>
+  	<script src="/js/hook-duoshuo.js"></script>
+  
+
+    
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.1"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.1"></script>
+  
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/js/motion_global.js?v=0.4.5.1" id="motion.global"></script>
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.1" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+    });
+  </script>
+
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
