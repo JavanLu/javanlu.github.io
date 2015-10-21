@@ -28,7 +28,7 @@
 
 
 
-  <meta name="keywords" content="Git," />
+  <meta name="keywords" content="Mac,SublimeText," />
 
 
 
@@ -37,16 +37,39 @@
   <link rel="shorticon icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.1" />
 
 
-<meta name="description" content="之前一直用 EGit 进行操作，只是简单地看了下相关指令，导致囫囵吞枣，很多原理性的东西没有领会，用 Git bash 时异常痛苦，现在回头重新学习一下，列出一些有用的学习资料：">
+<meta name="description" content="本文从快捷键、插件两个方面介绍在Mac下使用SublimeText3的一些经验。
+快捷键为方便表达，约定下面的标记。左边是缩写，右边是键盘上的按钮。
+
+
+cmd = command ⌘
+shift = shift ⇧
+option = option(alt) ⌥
+control = control ⌃">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Git学习资料">
-<meta property="og:url" content="http://yoursite.com/2013/09/27/git-learning/index.html">
+<meta property="og:title" content="SublimeText3 使用指南">
+<meta property="og:url" content="http://yoursite.com/2015/10/20/sublime-text-3-usage-guide/index.html">
 <meta property="og:site_name" content="Javan's Blog">
-<meta property="og:description" content="之前一直用 EGit 进行操作，只是简单地看了下相关指令，导致囫囵吞枣，很多原理性的东西没有领会，用 Git bash 时异常痛苦，现在回头重新学习一下，列出一些有用的学习资料：">
-<meta property="og:updated_time" content="2015-08-19T14:34:13.000Z">
+<meta property="og:description" content="本文从快捷键、插件两个方面介绍在Mac下使用SublimeText3的一些经验。
+快捷键为方便表达，约定下面的标记。左边是缩写，右边是键盘上的按钮。
+
+
+cmd = command ⌘
+shift = shift ⇧
+option = option(alt) ⌥
+control = control ⌃">
+<meta property="og:image" content="http://yoursite.com/2015/10/20/sublime-text-3-usage-guide/cmd_d.gif">
+<meta property="og:image" content="http://yoursite.com/2015/10/20/sublime-text-3-usage-guide/cmd_shift_l.gif">
+<meta property="og:updated_time" content="2015-10-21T14:33:30.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Git学习资料">
-<meta name="twitter:description" content="之前一直用 EGit 进行操作，只是简单地看了下相关指令，导致囫囵吞枣，很多原理性的东西没有领会，用 Git bash 时异常痛苦，现在回头重新学习一下，列出一些有用的学习资料：">
+<meta name="twitter:title" content="SublimeText3 使用指南">
+<meta name="twitter:description" content="本文从快捷键、插件两个方面介绍在Mac下使用SublimeText3的一些经验。
+快捷键为方便表达，约定下面的标记。左边是缩写，右边是键盘上的按钮。
+
+
+cmd = command ⌘
+shift = shift ⇧
+option = option(alt) ⌥
+control = control ⌃">
 
 
 <script type="text/javascript" id="hexo.configuration">
@@ -56,7 +79,7 @@
   };
 </script>
 
-  <title> Git学习资料 | Javan's Blog </title>
+  <title> SublimeText3 使用指南 | Javan's Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -184,7 +207,7 @@
           
           
             
-              Git学习资料
+              SublimeText3 使用指南
             
           
         </h1>
@@ -193,8 +216,8 @@
       <div class="post-meta">
         <span class="post-time">
           发表于
-          <time itemprop="dateCreated" datetime="2013-09-27T09:51:00+08:00" content="2013-09-27">
-            2013-09-27
+          <time itemprop="dateCreated" datetime="2015-10-20T21:22:51+08:00" content="2015-10-20">
+            2015-10-20
           </time>
         </span>
 
@@ -219,8 +242,8 @@
           
             <span class="post-comments-count">
               &nbsp; | &nbsp;
-              <a href="/2013/09/27/git-learning/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count ds-thread-count" data-thread-key="2013/09/27/git-learning/" itemprop="commentsCount"></span>
+              <a href="/2015/10/20/sublime-text-3-usage-guide/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count ds-thread-count" data-thread-key="2015/10/20/sublime-text-3-usage-guide/" itemprop="commentsCount"></span>
               </a>
             </span>
           
@@ -234,16 +257,91 @@
       
 
       
-        <span itemprop="articleBody"><p>之前一直用 EGit 进行操作，只是简单地看了下相关指令，导致囫囵吞枣，很多原理性的东西没有领会，用 Git bash 时异常痛苦，现在回头重新学习一下，列出一些有用的学习资料：<br><a id="more"></a></p>
-<ol>
-<li>Git 简易指南: <a href="http://rogerdudler.github.io/git-guide/index.zh.html" target="_blank" rel="external">http://rogerdudler.github.io/git-guide/index.zh.html</a></li>
-<li>Git Cheat Sheet: <a href="http://rogerdudler.github.io/git-guide/files/git_cheat_sheet.pdf" target="_blank" rel="external">http://rogerdudler.github.io/git-guide/files/git_cheat_sheet.pdf</a></li>
-<li>Git 简易实战: <a href="http://try.github.io/levels/1/challenges/1" target="_blank" rel="external">http://try.github.io/levels/1/challenges/1</a></li>
-<li>Git 操作教程视频: <a href="http://www.tudou.com/plcover/d49-O4DXNBg/" target="_blank" rel="external">http://www.tudou.com/plcover/d49-O4DXNBg/</a></li>
-<li>Pro Git 中文版: <a href="http://git-scm.com/book/zh" target="_blank" rel="external">http://git-scm.com/book/zh</a>。 <strong>强烈推荐</strong></li>
-<li>10篇写给Git初学者的最佳教程: <a href="http://paranimage.com/best-git-tutoritals-for-beginners/" target="_blank" rel="external">http://paranimage.com/best-git-tutoritals-for-beginners/</a></li>
-<li>如何高效利用GitHub: <a href="http://www.yangzhiping.com/tech/github.html" target="_blank" rel="external">http://www.yangzhiping.com/tech/github.html</a></li>
+        <span itemprop="articleBody"><p>本文从快捷键、插件两个方面介绍在Mac下使用SublimeText3的一些经验。</p>
+<h2 id="快捷键">快捷键</h2><p>为方便表达，约定下面的标记。左边是缩写，右边是键盘上的按钮。</p>
+<blockquote>
+<ul>
+<li>cmd = command ⌘</li>
+<li>shift = shift ⇧</li>
+<li>option = option(alt) ⌥</li>
+<li>control = control ⌃</li>
+</ul>
+</blockquote>
+<a id="more"></a>
+<h3 id="基础">基础</h3><ol>
+<li>cmd + o：快速打开文件对话框</li>
+<li>cmd + w：关闭当前Tab页</li>
+<li>cmd + n：创建新Tab页</li>
+<li>cmd + q：退出程序</li>
+<li>cmd + shift + t：重新打开刚刚被关闭的Tab页</li>
+<li>esc：退出功能，退出光标多行选择、退出搜索框、退出命令框等</li>
 </ol>
+<h3 id="显示类">显示类</h3><ol>
+<li>cmd + option + 1：还原编辑区为一个</li>
+<li>cmd + option + 5：编辑区一分为四</li>
+<li>cmd + option + 数字［2，3，4］：垂直分割编辑区</li>
+<li>cmd + option + shift + 数字［2，3］：水平分割编辑区</li>
+<li>cmd + k 再 cmd + b：关闭左侧的文件夹目录，让编辑区变得更大；再按一遍，打开</li>
+<li>cmd + shift + control + f：进入全屏状态，左边的文件夹目录自动隐藏；再按一遍，恢复</li>
+</ol>
+<h3 id="选择类">选择类</h3><ol>
+<li><p>cmd + d (可连按)：快速选择范围内的字符串，连按会选取文件内相同的字符串<br> 当选取完成后，可以直接编辑，所有被选的字符串会被改成新字符串。</p>
+ <img src="/2015/10/20/sublime-text-3-usage-guide/cmd_d.gif" alt="cmd_d.gif" title="">
+</li>
+<li><p>cmd + l：选取光标所在的一行，连按则往下选择下面的行</p>
+</li>
+<li><p>cmd + shift + l：与 cmd+l 配合使用，当选取多行后，按下 cmd+shift+l，则会在多行的结尾出现光标，可以做多行编辑</p>
+ <img src="/2015/10/20/sublime-text-3-usage-guide/cmd_shift_l.gif" alt="这是一个录屏标示" title="这是一个录屏标示">
+</li>
+<li><p>cmd + 左或右：让光标快速地回到当前行的首部或尾部</p>
+</li>
+<li>shift + 左或右：每次选择一个字元</li>
+<li>cmd + shift + 左或右：从光标所在位置，向前或者向后选取改行到底</li>
+<li>cmd + control + p：切换侧边栏显示的工程</li>
+</ol>
+<h3 id="搜索类">搜索类</h3><p>sublime具有强大的搜索功能，不论是文件内容、文件名称，都可以快速找到。</p>
+<ol>
+<li>cmd + p + 搜索内容：按下cmd+p，之后再等视窗出现后，输入要找的内容，按下enter即可打开</li>
+<li>cmd + p + “:” + 行数： 与 <code>control + g</code>相同，可以快速跳到指定行</li>
+<li>cmd + p + “@” + function name： 与 <code>cmd + r</code>相同，可以快速跳到定义的function</li>
+<li>cmd + p + “#” + keyword：快速找到文件内的关键字</li>
+<li>cmd + shift + f：全文搜索，可以找出整个工程内的关键字。在查询结果内，点击两下，即可跳到该文件</li>
+</ol>
+<h3 id="编辑类">编辑类</h3><ol>
+<li>cmd + Enter：在下一行插入新行</li>
+<li>cmd + shift + Enter：在上一行插入新行</li>
+<li>control + shift + k：删除整行</li>
+<li>control + k：从光标处开始删除代码至行尾</li>
+<li>cmd + k + u：转换大写</li>
+<li>cmd + k + l：转换小写</li>
+<li>cmd + /：注释单</li>
+<li>cmd + j：将选中区域合并为一行</li>
+</ol>
+<h2 id="插件">插件</h2><h3 id="如何安装插件">如何安装插件</h3><ul>
+<li><p>安装方式一</p>
+<blockquote>
+<p>直接下载安装包解压缩到Packages目录（菜单-&gt;Preferences-&gt;Browser Packages</p>
+</blockquote>
+</li>
+<li><p>安装方式二</p>
+<blockquote>
+<p>按<code>control+` </code>调出console粘贴以下代码到底部命令行并回车：</p>
+<figure class="highlight openscad"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="built_in">import</span> urllib.request,os,hashlib; h = '<span class="number">2915</span>d1851351e5ee549c20394736b442' + '<span class="number">8</span>bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path<span class="params">()</span>; urllib.request.install_opener<span class="params">( urllib.request.build_opener<span class="params">( urllib.request.ProxyHandler<span class="params">()</span>)</span> )</span>; by = urllib.request.urlopen<span class="params">( 'http://packagecontrol.io/' + pf.replace<span class="params">(' ', '%<span class="number">20</span>')</span>)</span>.read<span class="params">()</span>; dh = hashlib.sha256<span class="params">(by)</span>.hexdigest<span class="params">()</span>; print<span class="params">('Error validating download <span class="params">(got %s instead of %s)</span>, please try manual install' % <span class="params">(dh, h)</span>)</span> <span class="keyword">if</span> dh <span class="built_in">!</span>= h <span class="keyword">else</span> open<span class="params">(os.path.join<span class="params">( ipp, pf)</span>, 'wb' )</span>.write<span class="params">(by)</span></span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<p>重启Sublime Text 3。如果在Perferences-&gt;Package settings中看到Package Control这一项，则安装成功。按下<code>cmd + shift + p</code>调出命令面板输入install 调出 Install Package 选项并回车，然后在列表中选中要安装的插件。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="推荐插件">推荐插件</h3><ul>
+<li><a href="https://github.com/seanliang/ConvertToUTF8/blob/master/README.zh_CN.md" target="_blank" rel="external">ConvertToUTF8</a><br>  GBK转成UTF-8，以后看到乱码再也不头疼了。</li>
+<li><a href="https://github.com/SublimeText-Markdown/MarkdownEditing" target="_blank" rel="external">Markdown Editing</a><br>  这个插件通过适当的颜色高亮和其它功能查看和编辑Markdown文件。</li>
+<li><a href="https://github.com/revolunet/sublimetext-markdown-preview" target="_blank" rel="external">Markdown Preview</a><br>  预览Markdown文件的插件。安装后，<code>cmd + shift + p</code>调出命令面板，输入<code>mdp</code>即可出现各种预览命令。</li>
+<li><a href="https://github.com/wuub/SublimeREPL" target="_blank" rel="external">SublimeREPL</a><br>  在 Sublime Text 中运行各种语言（NodeJS、Python、Ruby和Scala等）。</li>
+<li><a href="https://github.com/titoBouzout/SideBarEnhancements/tree/st3" target="_blank" rel="external">SideBarEnhancements</a><br>  安装插件后在侧边栏上点击右键，可以找到一下新功能：在资源管理器中打开、新建文件、新建文件夹、以…打开、在浏览器中打开。</li>
+<li><a href="https://github.com/leonid-shevtsov/ClickableUrls_SublimeText" target="_blank" rel="external">ClickableURLs</a><br>  让文件中的URL能够点击.</li>
+</ul>
+<h2 id="参考文献">参考文献</h2><blockquote>
+<p>[1] <a href="http://dengo.org/archives/970" target="_blank" rel="external">sublime text 3解放鼠标的快捷键总结</a><br>[2] <a href="http://code.kpman.cc/2014/10/14/sublime-text-3-mac-%E6%8C%87%E5%8D%97/" target="_blank" rel="external">Sublime Text 3 Mac 指南</a><br>[3] <a href="http://www.tuicool.com/articles/nQFnQrR" target="_blank" rel="external">12个不可不知的Sublime Text应用技巧和诀窍</a><br>[4] <a href="http://zh.lucida.me/blog/sublime-text-complete-guide/" target="_blank" rel="external">Sublime Text 全程指南</a><br>[5] <a href="http://www.jianshu.com/p/3cb5c6f2421c" target="_blank" rel="external">如何优雅地使用Sublime Text3</a><br>[6] <a href="https://blog.generalassemb.ly/sublime-text-3-tips-tricks-shortcuts/" target="_blank" rel="external">GETTING STARTED WITH SUBLIME TEXT 3: 25 TIPS, TRICKS, AND SHORTCUTS</a></p>
+</blockquote>
 </span>
       
     </div>
@@ -252,7 +350,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Git/" rel="tag">#Git</a>
+            <a href="/tags/Mac/" rel="tag">#Mac</a>
+          
+            <a href="/tags/SublimeText/" rel="tag">#SublimeText</a>
           
         </div>
       
@@ -261,13 +361,11 @@
         <div class="post-nav">
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2013/09/27/csrf-brief-analysis/" rel="prev">浅析CSRF</a>
-            
           </div>
 
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2013/09/26/consistent-hashing/" rel="next">[译] 一致性哈希算法</a>
+              <a href="/2015/10/11/linux-vmstat/" rel="next">linux_vmstat</a>
             
           </div>
         </div>
@@ -315,8 +413,8 @@
         
           <div class="comments" id="comments">
             
-              <div class="ds-thread" data-thread-key="2013/09/27/git-learning/"
-                   data-title="Git学习资料" data-url="http://yoursite.com/2013/09/27/git-learning/">
+              <div class="ds-thread" data-thread-key="2015/10/20/sublime-text-3-usage-guide/"
+                   data-title="SublimeText3 使用指南" data-url="http://yoursite.com/2015/10/20/sublime-text-3-usage-guide/">
               </div>
             
           </div>
@@ -398,7 +496,7 @@
           <div class="post-toc">
             
             
-              <p class="post-toc-empty">此文章未包含目录</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#快捷键"><span class="nav-number">1.</span> <span class="nav-text">快捷键</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#基础"><span class="nav-number">1.1.</span> <span class="nav-text">基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示类"><span class="nav-number">1.2.</span> <span class="nav-text">显示类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#选择类"><span class="nav-number">1.3.</span> <span class="nav-text">选择类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#搜索类"><span class="nav-number">1.4.</span> <span class="nav-text">搜索类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑类"><span class="nav-number">1.5.</span> <span class="nav-text">编辑类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#插件"><span class="nav-number">2.</span> <span class="nav-text">插件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#如何安装插件"><span class="nav-number">2.1.</span> <span class="nav-text">如何安装插件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#推荐插件"><span class="nav-number">2.2.</span> <span class="nav-text">推荐插件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">3.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
